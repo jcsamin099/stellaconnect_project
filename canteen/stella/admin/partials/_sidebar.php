@@ -100,7 +100,7 @@ while ($admin = $res->fetch_object()) {
             <a class="nav-link <?php if (basename($_SERVER['PHP_SELF']) == 'payments_reports.php')
               echo 'active'; ?>"
               href="payments_reports.php">
-              <i class="fas fa-funnel-dollar"></i> Payments
+              <i class="fas fa-funnel-dollar"></i> Payments Method
             </a>
           </li>
         </ul>

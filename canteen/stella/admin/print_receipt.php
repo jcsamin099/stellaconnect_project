@@ -3,6 +3,8 @@ session_start();
 include('config/config.php');
 include('config/checklogin.php');
 check_login();
+
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -40,7 +42,7 @@ $res = $stmt->get_result();
 while ($order = $res->fetch_object()) {
     $total = ($order->prod_price * $order->prod_qty);
 
-?>
+    ?>
 
     <body>
         <div class="container">
@@ -53,7 +55,7 @@ while ($order = $res->fetch_object()) {
                                 <br>
                                 127-0-0-1
                                 <br>
-                               Cabanatuan City
+                                Cabanatuan City
                                 <br>
                                 (+000) 9999999999
                             </address>
@@ -82,13 +84,29 @@ while ($order = $res->fetch_object()) {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td class="col-md-6"><em> Order Item </em></h4>
-                                    </td>
-                                    <td class="col-md-1" style="text-align: center"></td>
-                                    <td class="col-md-3 text-center">₱ <?php echo $order->prod_price; ?></td>
-                                    <td class="col-md-3 text-center">₱ <?php echo $order->prod_price; ?></td>
-                                </tr>
+                                <?php
+                                $order_items_sql = "SELECT * FROM purchase_detail 
+                    LEFT JOIN rpos_products ON rpos_products.prod_id = purchase_detail.prod_id 
+                    WHERE purchase_detail.order_id = ?";
+                                $order_items_stmt = $mysqli->prepare($order_items_sql);
+                                $order_items_stmt->bind_param('s', $order->order_id);
+                                $order_items_stmt->execute();
+                                $order_items_res = $order_items_stmt->get_result();
+                                $grand_total = 0;
+
+                                while ($item = $order_items_res->fetch_object()) {
+                                    $subtotal = $item->prod_price * $item->prod_qty;
+                                    $grand_total += $subtotal;
+                                    ?>
+                                    <tr>
+                                        <td class="col-md-6"><?php echo $item->prod_name; ?></td>
+                                        <td class="col-md-1 text-center"><?php echo $item->prod_qty; ?></td>
+                                        <td class="col-md-3 text-center">₱ <?php echo number_format($item->prod_price, 2); ?>
+                                        </td>
+                                        <td class="col-md-3 text-center">₱ <?php echo number_format($subtotal, 2); ?></td>
+                                    </tr>
+                                <?php } ?>
+
                                 <tr>
                                     <td>   </td>
                                     <td>   </td>
@@ -111,7 +129,7 @@ while ($order = $res->fetch_object()) {
                                             <strong> <?php echo $order->pay_method; ?></strong>
                                         </p>
                                         <p>
-                                            <strong>₱ <?php echo $order->paid_amount -  $order->prod_price ; ?></strong>
+                                            <strong>₱ <?php echo $order->paid_amount - $order->prod_price; ?></strong>
                                         </p>
                                     </td>
                                 </tr>
@@ -119,7 +137,7 @@ while ($order = $res->fetch_object()) {
                                     <td>   </td>
                                     <td>   </td>
                                     <td class="text-right">
-                                        <h4><strong>Total: </strong></h4>
+                                        <h4><strong>Total: </strong></h4>-
                                     </td>
                                     <td class="text-center text-danger">
                                         <h4><strong>₱ <?php echo $order->prod_price; ?></strong></h4>
@@ -130,7 +148,8 @@ while ($order = $res->fetch_object()) {
                     </div>
                 </div>
                 <div class="well col-xs-10 col-sm-10 col-md-6 col-xs-offset-1 col-sm-offset-1 col-md-offset-3">
-                    <button id="print" onclick="printContent('Receipt');" class="btn btn-success btn-lg text-justify btn-block">
+                    <button id="print" onclick="printContent('Receipt');"
+                        class="btn btn-success btn-lg text-justify btn-block">
                         Print <span class="fas fa-print"></span>
                     </button>
                 </div>
@@ -138,14 +157,14 @@ while ($order = $res->fetch_object()) {
         </div>
     </body>
 
-</html>
-<script>
-    function printContent(el) {
-        var restorepage = $('body').html();
-        var printcontent = $('#' + el).clone();
-        $('body').empty().html(printcontent);
-        window.print();
-        $('body').html(restorepage);
-    }
-</script>
+    </html>
+    <script>
+        function printContent(el) {
+            var restorepage = $('body').html();
+            var printcontent = $('#' + el).clone();
+            $('body').empty().html(printcontent);
+            window.print();
+            $('body').html(restorepage);
+        }
+    </script>
 <?php } ?>

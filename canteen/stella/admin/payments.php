@@ -83,7 +83,7 @@ require_once('partials/_head.php');
                                     <tr>
                                         <th scope="col">Code</th>
                                         <th scope="col">Customer</th>
-                                        <th scope="col">Product</th>
+                                        
                                         <th scope="col">Total Price</th>
                                         <th scope="col">Date</th>
                                         <th scope="col">Action</th>
@@ -103,7 +103,7 @@ require_once('partials/_head.php');
                                         <tr>
                                             <th class="text-yellow" scope="row"><?php echo $order->order_code; ?></th>
                                             <td><?php echo $order->customer_name; ?></td>
-                                            <td><?php echo $order->prod_name; ?></td>
+                                            
                                             <td><?php echo $total; ?></td>
                                             <td><?php echo date('d/M/Y g:i', strtotime($order->created_at)); ?></td>
                                             <td>
