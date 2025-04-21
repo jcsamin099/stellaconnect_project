@@ -6,7 +6,6 @@ include('config/code-generator.php');
 
 check_login();
 if (isset($_POST['addProduct'])) {
-  //Prevent Posting Blank Values
   if (empty($_POST["prod_code"]) || empty($_POST["prod_name"]) || empty($_POST['prod_desc']) || empty($_POST['prod_price'])) {
     $err = "Blank Values Not Accepted";
   } else {
@@ -17,16 +16,14 @@ if (isset($_POST['addProduct'])) {
     move_uploaded_file($_FILES["prod_img"]["tmp_name"], "assets/img/products/" . $_FILES["prod_img"]["name"]);
     $prod_desc = $_POST['prod_desc'];
     $prod_price = $_POST['prod_price'];
-	//Visit codeastro.com for more projects
-    //Insert Captured information to a database table
+
     $postQuery = "INSERT INTO rpos_products (prod_id, prod_code, prod_name, prod_img, prod_desc, prod_price ) VALUES(?,?,?,?,?,?)";
     $postStmt = $mysqli->prepare($postQuery);
-    //bind paramaters
     $rc = $postStmt->bind_param('ssssss', $prod_id, $prod_code, $prod_name, $prod_img, $prod_desc, $prod_price);
     $postStmt->execute();
-    //declare a varible which will be passed to alert function
+
     if ($postStmt) {
-      $success = "Product Added" && header("refresh:1; url=add_product.php");
+      $success = "Product Added Successfully!";
     } else {
       $err = "Please Try Again Or Try Later";
     }
@@ -34,29 +31,20 @@ if (isset($_POST['addProduct'])) {
 }
 require_once('partials/_head.php');
 ?>
+<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <body>
-  <!-- Sidenav -->
-  <?php
-  require_once('partials/_sidebar.php');
-  ?>
-  <!-- Main content -->
+  <?php require_once('partials/_sidebar.php'); ?>
   <div class="main-content">
-    <!-- Top navbar -->
-    <?php
-    require_once('partials/_topnav.php');
-    ?>
-    <!-- Header -->
-    <div style="background-image: url(assets/img/theme/restro00.jpg); background-size: cover;" class="header  pb-8 pt-5 pt-md-8">
-    <span class="mask  opacity-8" style="background-color:#800000;"></span>
+    <?php require_once('partials/_topnav.php'); ?>
+    <div style="background-image: url(assets/img/theme/restro00.jpg); background-size: cover;" class="header pb-8 pt-5 pt-md-8">
+      <span class="mask bg-gradient-warning opacity-8"></span>
       <div class="container-fluid">
-        <div class="header-body">
-        </div>
+        <div class="header-body"></div>
       </div>
     </div>
-    <!-- Page content -->
     <div class="container-fluid mt--8">
-      <!-- Table -->
       <div class="row">
         <div class="col">
           <div class="card shadow">
@@ -73,31 +61,31 @@ require_once('partials/_head.php');
                   </div>
                   <div class="col-md-6">
                     <label>Product Code</label>
-                    <input type="text" name="prod_code" value="<?php echo $alpha; ?>-<?php echo $beta; ?>" class="form-control" value="">
+                    <input type="text" name="prod_code" value="<?php echo $alpha; ?>-<?php echo $beta; ?>" class="form-control">
                   </div>
                 </div>
                 <hr>
                 <div class="form-row">
                   <div class="col-md-6">
                     <label>Product Image</label>
-                    <input type="file" name="prod_img" class="btn btn-outline-success form-control" value="">
+                    <input type="file" name="prod_img" class="btn btn-outline-success form-control">
                   </div>
                   <div class="col-md-6">
                     <label>Product Price</label>
-                    <input type="text" name="prod_price" class="form-control" value="">
+                    <input type="text" name="prod_price" class="form-control">
                   </div>
                 </div>
                 <hr>
                 <div class="form-row">
                   <div class="col-md-12">
                     <label>Product Description</label>
-                    <textarea rows="5" name="prod_desc" class="form-control" value=""></textarea>
+                    <textarea rows="5" name="prod_desc" class="form-control"></textarea>
                   </div>
                 </div>
                 <br>
                 <div class="form-row">
                   <div class="col-md-6">
-                    <input type="submit" name="addProduct" value="Add Product" class="btn btn-success" value="">
+                    <input type="submit" name="addProduct" value="Add Product" class="btn btn-success">
                   </div>
                 </div>
               </form>
@@ -105,16 +93,39 @@ require_once('partials/_head.php');
           </div>
         </div>
       </div>
-      <!-- Footer -->
-      <?php
-      require_once('partials/_footer.php');
-      ?>
+      <?php require_once('partials/_footer.php'); ?>
     </div>
   </div>
-  <!-- Argon Scripts -->
-  <?php
-  require_once('partials/_scripts.php');
-  ?>
-</body>
+  <?php require_once('partials/_scripts.php'); ?>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      <?php if (isset($success)) : ?>
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: <?= json_encode($success); ?>,
+          showCancelButton: true,
+          confirmButtonText: 'Add Another',
+          cancelButtonText: 'Back to Products'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = 'add_product.php';
+          } else {
+            window.location.href = 'products.php';
+          }
+        });
+      <?php endif; ?>
+
+      <?php if (isset($err)) : ?>
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: <?= json_encode($err); ?>,
+          confirmButtonText: 'OK'
+        });
+      <?php endif; ?>
+    });
+  </script>
+</body>
 </html>
