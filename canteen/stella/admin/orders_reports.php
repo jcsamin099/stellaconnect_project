@@ -8,29 +8,57 @@ require_once('partials/_head.php');
 
 <?php
 
+// Check if ID is set in the URL and process only if it's available
 if (isset($_GET['ID'])) {
-    $query = $mysqli->query("UPDATE rpos_orders SET order_status = 'Verified' WHERE order_id = '" . $_GET['ID'] . "'");
+    // Check if the confirmation has already been processed
+    if (isset($_GET['confirm']) && $_GET['confirm'] == 'true') {
+        // If confirmed, update the order status in the database
+        $query = $mysqli->query("UPDATE rpos_orders SET order_status = 'Verified' WHERE order_id = '" . $_GET['ID'] . "'");
 
-    if ($query) {
+        if ($query) {
+            echo "
+            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Order status updated successfully!',
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.href = 'orders_reports.php';
+                    });
+                });
+            </script>";
+        }
+    } else {
+        // If confirmation isn't set, show the confirmation alert
         echo "
         <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    text: 'Order status updated successfully!',
+                    title: 'Are you sure?',
+                    text: 'You want to mark this order as Verified.',
+                    icon: 'warning',
+                    showCancelButton: true,
                     confirmButtonColor: '#3085d6',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    window.location.href = 'orders_reports.php';
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, verify it!',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // If confirmed, redirect to the same page with a confirm parameter
+                        window.location.href = 'orders_reports.php?ID=" . $_GET['ID'] . "&confirm=true';
+                    }
                 });
             });
         </script>";
     }
 }
-
 ?>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <body>
@@ -45,7 +73,8 @@ if (isset($_GET['ID'])) {
         require_once('partials/_topnav.php');
         ?>
         <!-- Header -->
-        <div style="background-image: url(assets/img/theme/restro00.jpg); background-size: cover;" class="header pb-8 pt-5 pt-md-8">
+        <div style="background-image: url(assets/img/theme/restro00.jpg); background-size: cover;"
+            class="header pb-8 pt-5 pt-md-8">
             <span class="mask opacity-8" style="background-color:#800000;"></span>
             <div class="container-fluid">
                 <div class="header-body"></div>
@@ -98,7 +127,7 @@ if (isset($_GET['ID'])) {
                                             $pay_method = $payment->pay_method;
                                             $pay_ref = $payment->pay_ref;
                                         }
-                                    ?>
+                                        ?>
                                         <tr>
                                             <th class="text-yellow" scope="row"><?php echo $order->order_code; ?></th>
                                             <td><?php echo $order->customer_name; ?></td>
@@ -125,26 +154,33 @@ if (isset($_GET['ID'])) {
                                             <td><?php echo date('d/M/Y g:i', strtotime($order->created_at)); ?></td>
                                             <td>
                                                 <!-- Button trigger modal -->
-                                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#details<?php echo $order->order_id; ?>">View</button>
+                                                <button type="button" class="btn btn-primary" data-toggle="modal"
+                                                    data-target="#details<?php echo $order->order_id; ?>">View</button>
 
                                                 <?php if ($order->order_status == 'Paid') { ?>
-                                                    <a href="orders_reports.php?ID=<?= $order->order_id ?>" class="btn btn-info">Paid</a>
+                                                    <a href="orders_reports.php?ID=<?= $order->order_id ?>"
+                                                        class="btn btn-info">Paid</a>
                                                 <?php } ?>
                                                 <!-- Modal -->
-                                                <div class="modal fade" id="details<?php echo $order->order_id; ?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                <div class="modal fade" id="details<?php echo $order->order_id; ?>"
+                                                    tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                                                    aria-hidden="true">
                                                     <div class="modal-dialog modal-lg" role="document">
                                                         <div class="modal-content">
                                                             <div class="modal-header">
                                                                 <center>
-                                                                    <h4 class="modal-title" id="exampleModal">Order Full Details</h4>
+                                                                    <h4 class="modal-title" id="exampleModal">Order Full
+                                                                        Details</h4>
                                                                 </center>
-                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <button type="button" class="close" data-dismiss="modal"
+                                                                    aria-label="Close">
                                                                     <span aria-hidden="true">&times;</span>
                                                                 </button>
                                                             </div>
                                                             <div class="modal-body">
                                                                 <div class="table-responsive">
-                                                                    <h5>Customer: <b><?php echo $order->customer_name; ?></b>
+                                                                    <h5>Customer:
+                                                                        <b><?php echo $order->customer_name; ?></b>
                                                                         <span class="text-right" style="float:right;">
                                                                             <?php echo date('M d, Y h:i A', strtotime($order->created_at)) ?>
                                                                         </span>
@@ -161,10 +197,12 @@ if (isset($_GET['ID'])) {
                                                                             $sql = "SELECT * FROM purchase_detail LEFT JOIN rpos_products ON rpos_products.prod_id = purchase_detail.prod_id WHERE order_id = '" . $order->order_id . "'";
                                                                             $dquery = $mysqli->query($sql);
                                                                             while ($drow = $dquery->fetch_array()) {
-                                                                            ?>
+                                                                                ?>
                                                                                 <tr>
                                                                                     <td><?php echo $drow['prod_name']; ?></td>
-                                                                                    <td class="text-right">&#8369; <?php echo number_format($drow['prod_price'], 2); ?></td>
+                                                                                    <td class="text-right">&#8369;
+                                                                                        <?php echo number_format($drow['prod_price'], 2); ?>
+                                                                                    </td>
                                                                                     <td><?php echo $drow['prod_qty']; ?></td>
                                                                                     <td class="text-right">&#8369;
                                                                                         <?php
@@ -173,19 +211,23 @@ if (isset($_GET['ID'])) {
                                                                                         ?>
                                                                                     </td>
                                                                                 </tr>
-                                                                            <?php
+                                                                                <?php
                                                                             }
                                                                             ?>
                                                                             <tr>
-                                                                                <td colspan="3" class="text-right"><b>TOTAL</b></td>
-                                                                                <td class="text-right">&#8369; <?php echo number_format($order->prod_price, 2); ?></td>
+                                                                                <td colspan="3" class="text-right">
+                                                                                    <b>TOTAL</b></td>
+                                                                                <td class="text-right">&#8369;
+                                                                                    <?php echo number_format($order->prod_price, 2); ?>
+                                                                                </td>
                                                                             </tr>
                                                                         </tbody>
                                                                     </table>
                                                                 </div>
                                                             </div>
                                                             <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                <button type="button" class="btn btn-secondary"
+                                                                    data-dismiss="modal">Close</button>
                                                             </div>
                                                         </div>
                                                     </div>
