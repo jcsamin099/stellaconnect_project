@@ -176,41 +176,62 @@ require_once('partials/_head.php');
             </div>
         </div>
     </div>
-    <div class="row" style="height: 500px;overflow-y:scroll;">
-    <?php
-    $sql = "SELECT * FROM rpos_products";
-    $result = $mysqli->query($sql);
-    while ($product = $result->fetch_assoc()): ?>
-        <div class="col-md-3 product-card">
-            <div class="card text-center">
-                <?php if($product['prod_img']) { ?>
-                    <img src="../admin/assets/img/products/<?php echo $product['prod_img']; ?>" class="card-img-top" alt="<?php echo $product['prod_name']; ?>">
-                <?php } else { ?>
-                    <img src='../admin/assets/img/products/default.jpg' class="card-img-top">
-                <?php } ?>
-                <div class="card-body">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" style="max-height: 500px; overflow-y: auto;">
+
+    <style>
+.card.text-center {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.card-img-top {
+    height: 180px;
+    object-fit: cover;
+}
+</style>
+
+<?php
+$sql = "SELECT * FROM rpos_products";
+$result = $mysqli->query($sql);
+while ($product = $result->fetch_assoc()): ?>
+    <div class="col-md-3 product-card mb-4">
+        <div class="card text-center h-100">
+            <?php if($product['prod_img']) { ?>
+                <img src="../admin/assets/img/products/<?php echo $product['prod_img']; ?>" class="card-img-top" alt="<?php echo $product['prod_name']; ?>">
+            <?php } else { ?>
+                <img src='../admin/assets/img/products/default.jpg' class="card-img-top">
+            <?php } ?>
+            <div class="card-body d-flex flex-column">
+                <div class="mb-2">
                     <h5 class="card-title"><?php echo $product['prod_name']; ?></h5>
                     <p>Price: ₱ <?php echo $product['prod_price']; ?></p>
-                    <form method="POST" onsubmit="return addToCart(this);">
-                        <input type="hidden" name="prod_id" value="<?php echo $product['prod_id']; ?>">
-                        <input type="hidden" name="product" value="<?php echo $product['prod_name']; ?>">
-                        <input type="hidden" name="price" value="<?php echo $product['prod_price']; ?>">
-                        <input type="hidden" name="image" value="<?php echo $product['prod_img']; ?>">
-                        <div class="input-group mb-3" style="max-width: 200px;">
-                            <div class="input-group-prepend">
-                                <button class="btn btn-outline-secondary minus-btn" type="button">-</button>
-                            </div>
-                            <input type="number" name="quantity" class="form-control text-center quantity-input" value="1" min="1">
-                            <div class="input-group-append">
-                                <button class="btn btn-outline-secondary plus-btn" type="button">+</button>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Add to Cart</button>
-                    </form>
                 </div>
+
+                <form method="POST" onsubmit="return addToCart(this);" class="mt-auto">
+                    <input type="hidden" name="prod_id" value="<?php echo $product['prod_id']; ?>">
+                    <input type="hidden" name="product" value="<?php echo $product['prod_name']; ?>">
+                    <input type="hidden" name="price" value="<?php echo $product['prod_price']; ?>">
+                    <input type="hidden" name="image" value="<?php echo $product['prod_img']; ?>">
+
+                    <div class="input-group mb-2" style="max-width: 200px; margin: 0 auto;">
+                        <div class="input-group-prepend">
+                            <button class="btn btn-outline-secondary minus-btn" type="button">-</button>
+                        </div>
+                        <input type="number" name="quantity" class="form-control text-center quantity-input" value="1" min="1">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary plus-btn" type="button">+</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">Add to Cart</button>
+                </form>
             </div>
         </div>
-    <?php endwhile; ?>
+    </div>
+<?php endwhile; ?>
+
             
     <nav aria-label="Page navigation" class="mt-4">
         <ul class="pagination justify-content-center" id="pagination"></ul>

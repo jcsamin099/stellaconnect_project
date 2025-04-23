@@ -62,6 +62,16 @@ if (isset($_GET['success_id'])) {
 
 require_once('partials/_head.php');
 ?>
+<style>
+    .card-img-top {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    object-position: center;
+    border-bottom: 1px solid #ddd;
+}
+
+</style>
 
 <!-- SweetAlert2 CDN -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

@@ -3,145 +3,212 @@ session_start();
 include('config/config.php');
 include('config/checklogin.php');
 check_login();
-if (isset($_GET['delete'])) {
-  $id = $_GET['delete'];
-  $adn = "DELETE FROM rpos_products WHERE prod_id = ?";
-  $stmt = $mysqli->prepare($adn);
-  $stmt->bind_param('s', $id);
-  $stmt->execute();
-  $stmt->close();
-  if ($stmt) {
-    $success = "Deleted Successfully";
-  } else {
-    $err = "Try Again Later";
-  }
-}
 require_once('partials/_head.php');
 ?>
 
-<body>
-  <!-- Sidenav -->
-  <?php
-  require_once('partials/_sidebar.php');
-  ?>
-  <!-- Main content -->
-  <div class="main-content">
-    <!-- Top navbar -->
-    <?php
-    require_once('partials/_topnav.php');
-    ?>
-    <!-- Header -->
-    <div style="background-image: url(assets/img/theme/restro00.jpg); background-size: cover;" class="header pb-8 pt-5 pt-md-8">
-      <span class="mask opacity-8" style="background-color:#800000;"></span>
-      <div class="container-fluid">
-        <div class="header-body">
-        </div>
-      </div>
-    </div>
-    <!-- Page content -->
-    <div class="container-fluid mt--8">
-      <!-- Table -->
-      <div class="row">
-        <div class="col">
-          <div class="card shadow">
-            <div class="card-header border-0">
-              <a href="add_product.php" class="btn btn-outline-warning">
-                <i class="fas fa-utensils"></i>
-                Add New Product
-              </a>
-            </div>
-            <div class="table-responsive">
-              <table class="table align-items-center table-flush">
-                <thead class="thead-light">
-                  <tr>
-                    <th scope="col">Image</th>
-                    <th scope="col">Product Code</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Price</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <?php
-                  $ret = "SELECT * FROM rpos_products";
-                  $stmt = $mysqli->prepare($ret);
-                  $stmt->execute();
-                  $res = $stmt->get_result();
-                  while ($prod = $res->fetch_object()) {
-                  ?>
-                    <tr>
-                      <td>
-                        <?php
-                        // Check if the product has an image, otherwise use the default image
-                        if ($prod->prod_img) {
-                          echo "<img src='assets/img/products/$prod->prod_img' style='height: 60px; width: 60px; object-fit: cover;' class='img-thumbnail'>";
-                        } else {
-                          echo "<img src='assets/img/products/default.jpg' style='height: 60px; width: 60px; object-fit: cover;' class='img-thumbnail'>";
-                        }
-                        ?>
-                      </td>
-                      <td><?php echo $prod->prod_code; ?></td>
-                      <td><?php echo $prod->prod_name; ?></td>
-                      <td><?php echo $prod->prod_price; ?></td>
-                      <td>
-                        <?php
-                        if ($prod->status == '1') {
-                          echo "<span class='badge badge-danger'>Not Available</span>";
-                        } else {
-                          echo "<span class='badge badge-primary'>Available</span>";
-                        }
-                        ?>
-                      </td>
-                      <td>
-                        <a href="products.php?delete=<?php echo $prod->prod_id; ?>" 
-                           onclick="return confirm('Are you sure you want to delete this product?');">
-                          <button class="btn btn-sm btn-danger">
-                            <i class="fas fa-trash"></i>
-                            Delete
-                          </button>
-                        </a>
-                        <a href="update_product.php?update=<?php echo $prod->prod_id; ?>">
-                          <button class="btn btn-sm btn-primary">
-                            <i class="fas fa-edit"></i>
-                            Update
-                          </button>
-                        </a>
-                      </td>
-                    </tr>
-                  <?php } ?>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Footer -->
-      <?php
-      require_once('partials/_footer.php');
-      ?>
-    </div>
-  </div>
+<?php
 
-  <!-- Argon Scripts -->
-  <?php
-  require_once('partials/_scripts.php');
-  ?>
+if (isset($_GET['ID'])) {
+    $query = $mysqli->query("UPDATE rpos_orders SET order_status = 'Verified' WHERE order_id = '" . $_GET['ID'] . "'");
 
-  <!-- JavaScript for Quantity Adjustment -->
-  <script>
-    function adjustQuantity(action) {
-      let qtyInput = document.getElementById('quantity');
-      let currentQty = parseInt(qtyInput.value);
-
-      if (action === 'increase') {
-        currentQty += 1;  // Increase quantity
-      } else if (action === 'decrease' && currentQty > 1) {
-        currentQty -= 1;  // Decrease quantity (minimum value 1)
-      }
-
-      qtyInput.value = currentQty; // Update input field
+    if ($query) {
+        echo "
+        <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Order status updated successfully!',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    window.location.href = 'orders_reports.php';
+                });
+            });
+        </script>";
     }
-  </script>
+}
+
+?>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<body>
+    <!-- Sidenav -->
+    <?php
+    require_once('partials/_sidebar.php');
+    ?>
+    <!-- Main content -->
+    <div class="main-content">
+        <!-- Top navbar -->
+        <?php
+        require_once('partials/_topnav.php');
+        ?>
+        <!-- Header -->
+        <div style="background-image: url(assets/img/theme/restro00.jpg); background-size: cover;" class="header pb-8 pt-5 pt-md-8">
+            <span class="mask opacity-8" style="background-color:#800000;"></span>
+            <div class="container-fluid">
+                <div class="header-body"></div>
+            </div>
+        </div>
+
+        <!-- Page content -->
+        <div class="container-fluid mt--8">
+            <!-- Table -->
+            <div class="row">
+                <div class="col">
+                    <div class="card shadow">
+                        <div class="card-header border-0">
+                            Orders Records
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table align-items-center table-flush">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th class="text-yellow" scope="col">Code</th>
+                                        <th scope="col">Customer</th>
+                                        <th scope="col">Payment Method</th>
+                                        <th scope="col">Payment Reference</th>
+                                        <th scope="col">Total Price</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Date</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $ret = "SELECT * FROM rpos_orders ORDER BY `created_at` DESC";
+                                    $stmt = $mysqli->prepare($ret);
+                                    $stmt->execute();
+                                    $res = $stmt->get_result();
+                                    while ($order = $res->fetch_object()) {
+                                        $total = $order->prod_price;
+
+                                        // Fetch payment method and reference in one query
+                                        $query = $mysqli->prepare("SELECT pay_method, pay_ref FROM rpos_payments WHERE order_code = ? ORDER BY created_at DESC LIMIT 1");
+                                        $query->bind_param("s", $order->order_code);
+                                        $query->execute();
+                                        $payment_result = $query->get_result();
+
+                                        $pay_method = "N/A";
+                                        $pay_ref = "N/A";
+
+                                        if ($payment_result->num_rows > 0) {
+                                            $payment = $payment_result->fetch_object();
+                                            $pay_method = $payment->pay_method;
+                                            $pay_ref = $payment->pay_ref;
+                                        }
+                                    ?>
+                                        <tr>
+                                            <th class="text-yellow" scope="row"><?php echo $order->order_code; ?></th>
+                                            <td><?php echo $order->customer_name; ?></td>
+
+                                            <!-- Payment Method -->
+                                            <td><?php echo $pay_method; ?></td>
+
+                                            <!-- Payment Reference -->
+                                            <td><?php echo $pay_ref; ?></td>
+
+                                            <td><?php echo number_format($total, 2); ?></td>
+
+                                            <td>
+                                                <?php
+                                                if ($order->order_status == '') {
+                                                    echo "<span class='badge badge-danger'>Not Paid</span>";
+                                                } elseif ($order->order_status == 'Paid') {
+                                                    echo "<span class='badge badge-success'>$order->order_status</span>";
+                                                } else {
+                                                    echo "<span class='badge badge-info'>$order->order_status</span>";
+                                                }
+                                                ?>
+                                            </td>
+                                            <td><?php echo date('d/M/Y g:i', strtotime($order->created_at)); ?></td>
+                                            <td>
+                                                <!-- Button trigger modal -->
+                                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#details<?php echo $order->order_id; ?>">View</button>
+
+                                                <?php if ($order->order_status == 'Paid') { ?>
+                                                    <a href="orders_reports.php?ID=<?= $order->order_id ?>" class="btn btn-info">Paid</a>
+                                                <?php } ?>
+                                                <!-- Modal -->
+                                                <div class="modal fade" id="details<?php echo $order->order_id; ?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog modal-lg" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <center>
+                                                                    <h4 class="modal-title" id="exampleModal">Order Full Details</h4>
+                                                                </center>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <div class="table-responsive">
+                                                                    <h5>Customer: <b><?php echo $order->customer_name; ?></b>
+                                                                        <span class="text-right" style="float:right;">
+                                                                            <?php echo date('M d, Y h:i A', strtotime($order->created_at)) ?>
+                                                                        </span>
+                                                                    </h5>
+                                                                    <table class="table align-items-center table-flush">
+                                                                        <thead>
+                                                                            <th>Product Name</th>
+                                                                            <th>Price</th>
+                                                                            <th>Purchase Quantity</th>
+                                                                            <th>Subtotal</th>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <?php
+                                                                            $sql = "SELECT * FROM purchase_detail LEFT JOIN rpos_products ON rpos_products.prod_id = purchase_detail.prod_id WHERE order_id = '" . $order->order_id . "'";
+                                                                            $dquery = $mysqli->query($sql);
+                                                                            while ($drow = $dquery->fetch_array()) {
+                                                                            ?>
+                                                                                <tr>
+                                                                                    <td><?php echo $drow['prod_name']; ?></td>
+                                                                                    <td class="text-right">&#8369; <?php echo number_format($drow['prod_price'], 2); ?></td>
+                                                                                    <td><?php echo $drow['prod_qty']; ?></td>
+                                                                                    <td class="text-right">&#8369;
+                                                                                        <?php
+                                                                                        $subt = $drow['prod_price'] * $drow['prod_qty'];
+                                                                                        echo number_format($subt, 2);
+                                                                                        ?>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            <?php
+                                                                            }
+                                                                            ?>
+                                                                            <tr>
+                                                                                <td colspan="3" class="text-right"><b>TOTAL</b></td>
+                                                                                <td class="text-right">&#8369; <?php echo number_format($order->prod_price, 2); ?></td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php } ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Footer -->
+            <?php
+            require_once('partials/_footer.php');
+            ?>
+        </div>
+    </div>
+    <!-- Argon Scripts -->
+    <?php
+    require_once('partials/_scripts.php');
+    ?>
 </body>
+
 </html>

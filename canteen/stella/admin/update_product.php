@@ -11,13 +11,13 @@ if (isset($_POST['UpdateProduct'])) {
     $err = "Blank Values Not Accepted";
   } else {
     $update = $_GET['update'];
-    $prod_code  = $_POST['prod_code'];
+    $prod_code = $_POST['prod_code'];
     $prod_name = $_POST['prod_name'];
     $prod_desc = $_POST['prod_desc'];
     $prod_status = $_POST['status'];
     $prod_price = $_POST['prod_price'];
 
-    if(empty($_FILES['prod_img']['name'])){
+    if (empty($_FILES['prod_img']['name'])) {
       $ret = "SELECT * FROM  rpos_products WHERE prod_id = '$update' ";
       $stmt = $mysqli->prepare($ret);
       $stmt->execute();
@@ -25,7 +25,7 @@ if (isset($_POST['UpdateProduct'])) {
       while ($prod = $res->fetch_object()) {
         $prod_img2 = $prod->prod_img;
       }
-    }else{
+    } else {
       $prod_img2 = $_FILES['prod_img']['name'];
       move_uploaded_file($_FILES["prod_img"]["tmp_name"], "assets/img/products/" . $_FILES["prod_img"]["name"]);
     }
@@ -38,7 +38,7 @@ if (isset($_POST['UpdateProduct'])) {
     $postStmt->execute();
     //declare a varible which will be passed to alert function
     if ($postStmt) {
-      $success = "Product Updated"&&header("refresh:1; url=products.php");
+      $success = "Product Updated" && header("refresh:1; url=products.php");
     } else {
       $err = "Please Try Again Or Try Later";
     }
@@ -63,10 +63,11 @@ require_once('partials/_head.php');
     $stmt->execute();
     $res = $stmt->get_result();
     while ($prod = $res->fetch_object()) {
-    ?>
+      ?>
       <!-- Header -->
-      <div style="background-image: url(assets/img/theme/restro00.jpg); background-size: cover;" class="header  pb-8 pt-5 pt-md-8">
-      <span class="mask  opacity-8" style="background-color:#800000;"></span>
+      <div style="background-image: url(assets/img/theme/restro00.jpg); background-size: cover;"
+        class="header  pb-8 pt-5 pt-md-8">
+        <span class="mask  opacity-8" style="background-color:#800000;"></span>
         <div class="container-fluid">
           <div class="header-body">
           </div>
@@ -90,19 +91,21 @@ require_once('partials/_head.php');
                     </div>
                     <div class="col-md-4">
                       <label>Product Code</label>
-                      <input type="text" name="prod_code" value="<?php echo $prod->prod_code; ?>" class="form-control" value="">
+                      <input type="text" name="prod_code" value="<?php echo $prod->prod_code; ?>" class="form-control"
+                        value="">
                     </div>
                     <div class="col-md-4">
-                      <label>Product Code</label>
+                      <label>Product Availability</label>
                       <select class="form-control" name="status">
                         <?php
-                        if($prod->status == 0){
+                        if ($prod->status == 0) {
                           $status = 'Available';
-                        }else{
+                        } else {
                           $status = 'Not Available';
                         }
                         ?>
                         <option value="<?php echo $prod->status; ?>"><?php echo $status; ?></option>
+                        <!-- Shows the current availability -->
                         <option value="0">Available</option>
                         <option value="1">Not Available</option>
                       </select>
@@ -112,7 +115,8 @@ require_once('partials/_head.php');
                   <div class="form-row">
                     <div class="col-md-6">
                       <label>Product Image</label>
-                      <input type="file" name="prod_img" class="btn btn-outline-success form-control" value="<?php echo $prod->prod_img; ?>">
+                      <input type="file" name="prod_img" class="btn btn-outline-success form-control"
+                        value="<?php echo $prod->prod_img; ?>">
                     </div>
                     <div class="col-md-6">
                       <label>Product Price</label>
@@ -123,7 +127,8 @@ require_once('partials/_head.php');
                   <div class="form-row">
                     <div class="col-md-12">
                       <label>Product Description</label>
-                      <textarea rows="5" name="prod_desc" class="form-control" value=""><?php echo $prod->prod_desc; ?></textarea>
+                      <textarea rows="5" name="prod_desc" class="form-control"
+                        value=""><?php echo $prod->prod_desc; ?></textarea>
                     </div>
                   </div>
                   <br>
@@ -138,11 +143,11 @@ require_once('partials/_head.php');
           </div>
         </div>
         <!-- Footer -->
-      <?php
-      require_once('partials/_footer.php');
+        <?php
+        require_once('partials/_footer.php');
     }
-      ?>
-      </div>
+    ?>
+    </div>
   </div>
   <!-- Argon Scripts -->
   <?php
