@@ -101,7 +101,7 @@ require_once('partials/_head.php');
 
                                         ?>
                                         <tr>
-                                            <th class="text-yellow" scope="row"><?php echo $order->order_code; ?></th>
+                                            <th class="text-black" scope="row"><?php echo $order->order_code; ?></th>
                                             <td><?php echo $order->customer_name; ?></td>
                                             
                                             <td><?php echo $total; ?></td>

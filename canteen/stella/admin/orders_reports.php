@@ -88,13 +88,13 @@ if (isset($_GET['ID'])) {
                 <div class="col">
                     <div class="card shadow">
                         <div class="card-header border-0">
-                            Orders Records
+                            <h1 class="font-extrabold">Orders Records</h1>
                         </div>
                         <div class="table-responsive">
                             <table class="table align-items-center table-flush">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th class="text-yellow" scope="col">Code</th>
+                                        <th class="" scope="col">Code</th>
                                         <th scope="col">Customer</th>
                                         <th scope="col">Payment Method</th>
                                         <th scope="col">Payment Reference</th>
@@ -129,7 +129,7 @@ if (isset($_GET['ID'])) {
                                         }
                                         ?>
                                         <tr>
-                                            <th class="text-yellow" scope="row"><?php echo $order->order_code; ?></th>
+                                            <th class="text-black" scope="row"><?php echo $order->order_code; ?></th>
                                             <td><?php echo $order->customer_name; ?></td>
 
                                             <!-- Payment Method -->
@@ -159,7 +159,7 @@ if (isset($_GET['ID'])) {
 
                                                 <?php if ($order->order_status == 'Paid') { ?>
                                                     <a href="orders_reports.php?ID=<?= $order->order_id ?>"
-                                                        class="btn btn-info">Paid</a>
+                                                        class="btn btn-info">Verify</a>
                                                 <?php } ?>
                                                 <!-- Modal -->
                                                 <div class="modal fade" id="details<?php echo $order->order_id; ?>"

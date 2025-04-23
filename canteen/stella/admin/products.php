@@ -63,7 +63,7 @@ require_once('partials/_head.php');
         <div class="col">
           <div class="card shadow">
             <div class="card-header border-0">
-              <a href="add_product.php" class="btn btn-outline-warning">
+              <a href="add_product.php" class="btn btn-outline-success">
                 <i class="fas fa-utensils"></i> Add New Product
               </a>
             </div>

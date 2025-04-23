@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 20, 2025 at 01:17 AM
--- Server version: 10.4.24-MariaDB
--- PHP Version: 7.4.29
+-- Generation Time: Apr 23, 2025 at 01:50 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -32,7 +32,7 @@ CREATE TABLE `purchase_detail` (
   `order_id` varchar(20) NOT NULL,
   `prod_id` varchar(20) NOT NULL,
   `prod_qty` varchar(20) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `purchase_detail`
@@ -83,7 +83,8 @@ INSERT INTO `purchase_detail` (`pdid`, `order_id`, `prod_id`, `prod_qty`) VALUES
 (54, '4208cf0a99', '06dc36c1be', '2'),
 (55, '4208cf0a99', '14c7b6370e', '2'),
 (56, 'b5f3ff7a91', '06dc36c1be', '1'),
-(57, 'b5f3ff7a91', '0c4b5c0604', '1');
+(57, 'b5f3ff7a91', '0c4b5c0604', '1'),
+(58, 'b026a88a1e', '06dc36c1be', '1');
 
 -- --------------------------------------------------------
 
@@ -96,14 +97,14 @@ CREATE TABLE `rpos_admin` (
   `admin_name` varchar(200) NOT NULL,
   `admin_email` varchar(200) NOT NULL,
   `admin_password` varchar(200) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `rpos_admin`
 --
 
 INSERT INTO `rpos_admin` (`admin_id`, `admin_name`, `admin_email`, `admin_password`) VALUES
-('10e0b6dc958adfb5b094d8935a13aeadbe783c25', 'Trex', 'admin@mail.com', '772372450f30b6d06b60aad4f073c6cbd111be0a');
+('10e0b6dc958adfb5b094d8935a13aeadbe783c25', 'Admin', 'admin@mail.com', '772372450f30b6d06b60aad4f073c6cbd111be0a');
 
 -- --------------------------------------------------------
 
@@ -120,7 +121,7 @@ CREATE TABLE `rpos_customers` (
   `created_at` timestamp(6) NOT NULL DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `rewards` double NOT NULL,
   `role` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `rpos_customers`
@@ -141,6 +142,7 @@ INSERT INTO `rpos_customers` (`customer_id`, `customer_name`, `customer_phoneno`
 ('a19109ab8e60', 'Julsz Calibre', '12121212', '19410054@cic.edu.ph', '772372450f30b6d06b60aad4f073c6cbd111be0a', '2025-03-18 01:28:59.837271', 0.65, 0),
 ('a1dbcf482163', 'Faculty1', '0992991221', '21310090@cic.edu.ph', '772372450f30b6d06b60aad4f073c6cbd111be0a', '2025-02-26 00:30:34.665558', 2.14, 1),
 ('d0ba61555aee', 'Jamie R. Barnes', '4125556587', 'jamie@mail.com', '55c3b5386c486feb662a0785f340938f518d547f', '2022-09-03 12:36:59.643216', 0, 0),
+('d206dc6c7e4f', 'JC Samin', '0912345678', '21410090@cic.edu.ph', 'a1126c9fca2cacd5003835f3cf54415f4fc62d83', '2025-04-23 09:28:21.438239', 0, 0),
 ('d7c2db8f6cbf', 'Victor A. Pierson', '1458887896', 'victor@mail.com', '55c3b5386c486feb662a0785f340938f518d547f', '2024-12-14 11:19:33.475416', 1.74, 0),
 ('e711dcc579d9', 'Julie R. Martin', '3245557896', 'julie@mail.com', '772372450f30b6d06b60aad4f073c6cbd111be0a', '2024-12-16 02:52:04.623067', 0.73, 0),
 ('fe6bb69bdd29', 'Brian S. Boucher', '1020302055', 'brians@mail.com', 'a69681bcf334ae130217fea4505fd3c994f5683f', '2022-09-03 13:16:29.591980', 0, 0);
@@ -162,7 +164,7 @@ CREATE TABLE `rpos_orders` (
   `prod_qty` varchar(200) NOT NULL,
   `order_status` varchar(200) NOT NULL,
   `created_at` timestamp(6) NOT NULL DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `rpos_orders`
@@ -193,6 +195,7 @@ INSERT INTO `rpos_orders` (`order_id`, `order_code`, `customer_id`, `customer_na
 ('aad97a28b1', 'EOLF-4581', 'fe6bb69bdd29', 'Brian S. Boucher', '06dc36c1be', 'Philly Cheesesteak', '7', '3', 'Paid', '2024-12-03 11:14:56.325068'),
 ('ae1e00dccd', 'DGTK-7189', 'e711dcc579d9', 'Julie R. Martin', '0c4b5c0604', 'Spaghetti Bolognese', '15', '2', 'Paid', '2024-12-12 12:00:23.683587'),
 ('af52d0022d', 'FNAB-9142', '35135b319ce3', 'Christine Moore', '2fdec9bdfb', 'Jambalaya', '9', '2', 'Paid', '2022-09-04 16:32:14.949302'),
+('b026a88a1e', 'BDJT-4519', 'd206dc6c7e4f', 'JC Samin', 'e769e274a3', '', '50', '0', '', '2025-04-23 09:29:37.489532'),
 ('b3540cc02a', 'NXPO-4315', '35135b319ce3', 'Christine Moore', 'e769e274a3', '11:41', '3', '0', 'Paid', '2025-02-08 05:54:04.460281'),
 ('b4b2a0ff2f', 'TCHE-2039', '27e4a5bc74c2', 'Tammy R. Polley', 'e769e274a3', 'N/A', '60', '0', 'Paid', '2024-12-13 02:10:26.070201'),
 ('b5f3ff7a91', 'NYXT-8379', 'a19109ab8e60', 'Julsz Calibre', 'e769e274a3', '10:20', '65', '0', 'Paid', '2025-03-18 01:28:59.835879'),
@@ -219,7 +222,7 @@ CREATE TABLE `rpos_pass_resets` (
   `reset_email` varchar(200) NOT NULL,
   `reset_status` varchar(200) NOT NULL,
   `created_at` timestamp(6) NOT NULL DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `rpos_pass_resets`
@@ -244,7 +247,7 @@ CREATE TABLE `rpos_payments` (
   `created_at` timestamp(6) NOT NULL DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `pay_ref` varchar(60) NOT NULL,
   `pay_proof` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `rpos_payments`
@@ -297,7 +300,7 @@ CREATE TABLE `rpos_products` (
   `prod_price` varchar(200) NOT NULL,
   `created_at` timestamp(6) NOT NULL DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `status` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `rpos_products`
@@ -344,7 +347,7 @@ CREATE TABLE `rpos_staff` (
   `staff_email` varchar(200) NOT NULL,
   `staff_password` varchar(200) NOT NULL,
   `created_at` timestamp(6) NOT NULL DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `rpos_staff`
@@ -366,7 +369,7 @@ CREATE TABLE `school_details` (
   `email` text NOT NULL,
   `date_created` datetime NOT NULL DEFAULT current_timestamp(),
   `role` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `school_details`
@@ -448,7 +451,7 @@ ALTER TABLE `school_details`
 -- AUTO_INCREMENT for table `purchase_detail`
 --
 ALTER TABLE `purchase_detail`
-  MODIFY `pdid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+  MODIFY `pdid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT for table `rpos_pass_resets`

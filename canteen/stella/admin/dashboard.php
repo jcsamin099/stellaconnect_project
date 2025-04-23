@@ -5,6 +5,39 @@ include('config/checklogin.php');
 check_login();
 require_once('partials/_head.php');
 require_once('partials/_analytics.php');
+
+// Fetch products count
+$sql = "SELECT COUNT(*) FROM rpos_products";
+$stmt = $mysqli->prepare($sql);
+$stmt->execute();
+$stmt->bind_result($products);
+$stmt->fetch();
+$stmt->close();
+
+// Fetch customers count
+$sql = "SELECT COUNT(*) FROM rpos_customers";
+$stmt = $mysqli->prepare($sql);
+$stmt->execute();
+$stmt->bind_result($customers);
+$stmt->fetch();
+$stmt->close();
+
+// Fetch orders count
+$sql = "SELECT COUNT(*) FROM rpos_orders";
+$stmt = $mysqli->prepare($sql);
+$stmt->execute();
+$stmt->bind_result($orders);
+$stmt->fetch();
+$stmt->close();
+
+// Fetch total sales
+$sql = "SELECT SUM(pay_amt) FROM rpos_payments";
+$stmt = $mysqli->prepare($sql);
+$stmt->execute();
+$stmt->bind_result($sales);
+$stmt->fetch();
+$stmt->close();
+
 ?>
 
 <body>
