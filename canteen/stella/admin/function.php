@@ -1,4 +1,6 @@
-<?php 
+function
+
+<?php
 session_start();
 $servername = "localhost";
 $username = "root";
@@ -10,61 +12,95 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$dborder_id = $_POST['order_id'];
-$order_code  = $_POST['order_code'];
-$customer_id = $_POST['customer_id'];
-$customer_name = $_POST['customer_name'];
-$prod_id  = 'e769e274a3';
-$prod_name = $_POST['pick_up'];
-$prod_price = '0';
-$prod_qty = '0';
+// SweetAlert function
+function sweetAlertRedirect($title, $text, $icon, $redirect) {
+    echo "
+    <html>
+    <head>
+        <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+    </head>
+    <body>
+        <script>
+            Swal.fire({
+                title: '$title',
+                text: '$text',
+                icon: '$icon',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                window.location.href = '$redirect';
+            });
+        </script>
+    </body>
+    </html>";
+    exit;
+}
 
-// Check if the customer exists
-$checkCustomerQuery = "SELECT customer_id FROM rpos_customers WHERE customer_id = ?";
-$checkStmt = $conn->prepare($checkCustomerQuery);
+// Check if cart is empty
+if (empty($_SESSION['cart'])) {
+    sweetAlertRedirect('Empty Cart!', 'No items in the cart. Please add items before proceeding to checkout.', 'warning', 'orders.php');
+}
+
+$dborder_id     = $_POST['order_id'];
+$order_code     = $_POST['order_code'];
+$customer_id    = $_POST['customer_id'];
+$customer_name  = $_POST['customer_name'];
+$prod_id        = 'e769e274a3';
+$prod_name      = $_POST['pick_up'];
+$prod_price     = 0;
+$prod_qty       = 0;
+
+// Check customer existence
+$checkStmt = $conn->prepare("SELECT customer_id FROM rpos_customers WHERE customer_id = ?");
 $checkStmt->bind_param('s', $customer_id);
 $checkStmt->execute();
 $checkResult = $checkStmt->get_result();
 
 if ($checkResult->num_rows == 0) {
-    // Customer does not exist, return an error message or handle accordingly
-    echo "Error: Customer does not exist!";
-    exit;
+    sweetAlertRedirect('Customer Not Found!', 'The customer does not exist in the system.', 'error', 'orders.php');
 }
 
-$total = 0; 
+// Begin transaction
+$conn->begin_transaction();
 
-// Insert the order if customer exists
-$postQuery = "INSERT INTO rpos_orders (prod_qty, order_id, order_code, customer_id, customer_name, prod_id, prod_name, prod_price) VALUES(?,?,?,?,?,?,?,?)";
-$postStmt = $conn->prepare($postQuery);
-//bind paramaters
-$rc = $postStmt->bind_param('ssssssss', $prod_qty, $dborder_id, $order_code, $customer_id, $customer_name, $prod_id, $prod_name, $prod_price);
-$postStmt->execute();
+try {
+    // Insert order
+    $postStmt = $conn->prepare("INSERT INTO rpos_orders (prod_qty, order_id, order_code, customer_id, customer_name, prod_id, prod_name, prod_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $postStmt->bind_param('ssssssss', $prod_qty, $dborder_id, $order_code, $customer_id, $customer_name, $prod_id, $prod_name, $prod_price);
+    $postStmt->execute();
 
-foreach ($_SESSION['cart'] as $item1 => $details1){
+    // Prepare purchase_detail insert
+    $detailStmt = $conn->prepare("INSERT INTO purchase_detail (order_id, prod_id, prod_qty) VALUES (?, ?, ?)");
 
-    $product_id = $details1["product_id"];
-    $order_id = $dborder_id;
-    $quantity = $details1["quantity"];
+    $total = 0;
 
-    $sql="insert into purchase_detail (order_id, prod_id, prod_qty) values ('$order_id', '$product_id', '$quantity')";
-    $result1 =  $conn->query($sql);
+    foreach ($_SESSION['cart'] as $item) {
+        $product_id = $item["product_id"];
+        $quantity   = $item["quantity"];
+        $price      = $item["price"];
 
-    $total += $details1['quantity'] * $details1['price'];
+        $detailStmt->bind_param('ssi', $dborder_id, $product_id, $quantity);
+        $detailStmt->execute();
 
-}
-
-// Update the order with the total price
-$sql="update rpos_orders set prod_price='$total' where order_id='$dborder_id' ";
-$conn->query($sql);
-
-// If purchase details are inserted successfully, empty the cart
-if($result1 == TRUE){
-    foreach ( $_SESSION["cart"] as $keys => $values) {
-        unset($_SESSION["cart"][$keys]);
-        echo '<script>window.open("orders.php?success_id=1","_self")</script>';
+        $total += $quantity * $price;
     }
-} else {
-    echo 'Fail';
+
+    // Update order total
+    $updateStmt = $conn->prepare("UPDATE rpos_orders SET prod_price = ? WHERE order_id = ?");
+    $updateStmt->bind_param('ds', $total, $dborder_id);
+    $updateStmt->execute();
+
+    // Commit transaction
+    $conn->commit();
+
+    // Empty cart
+    unset($_SESSION["cart"]);
+
+    header("Location: orders.php?success_id=1");
+    exit;
+
+} catch (Exception $e) {
+    $conn->rollback();
+    sweetAlertRedirect('Transaction Failed!', $e->getMessage(), 'error', 'orders.php');
 }
 ?>
