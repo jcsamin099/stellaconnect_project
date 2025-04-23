@@ -1,3 +1,5 @@
+orders
+
 <?php
 session_start();
 include('config/config.php');
@@ -20,18 +22,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $price = floatval($_POST['price']);
 
         if ($quantity > 0) {
-    if (isset($_SESSION['cart'][$product_id])) { // Use product_id as the key
-        $_SESSION['cart'][$product_id]['quantity'] += $quantity;
-    } else {
-        $_SESSION['cart'][$product_id] = [
-            'quantity' => $quantity, 
-            'product_id' => $product_id, 
-            'price' => $price, 
-            'image' => $image,
-            'product_name' => $product
-        ];
-    }
-}
+            if (isset($_SESSION['cart'][$product_id])) { // Use product_id as the key
+                $_SESSION['cart'][$product_id]['quantity'] += $quantity;
+            } else {
+                $_SESSION['cart'][$product_id] = [
+                    'quantity' => $quantity,
+                    'product_id' => $product_id,
+                    'price' => $price,
+                    'image' => $image,
+                    'product_name' => $product
+                ];
+            }
+        }
 
     }
 
@@ -64,13 +66,12 @@ require_once('partials/_head.php');
 ?>
 <style>
     .card-img-top {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    object-position: center;
-    border-bottom: 1px solid #ddd;
-}
-
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        object-position: center;
+        border-bottom: 1px solid #ddd;
+    }
 </style>
 
 <!-- SweetAlert2 CDN -->
@@ -270,92 +271,95 @@ require_once('partials/_head.php');
                         </button>
                     </div>
                     <div class="modal-body">
-    <form action="function.php" method="POST" id="checkoutForm">
-        <div class="row">
-            <div class="col-md-3">
-                <select class="form-control" name="customer_name" id="custName"
-                        onChange="getCustomer(this.value)">
-                    <option value="">Select Customer Name</option>
-                    <?php
-                    // Load All Customers
-                    $ret = "SELECT * FROM rpos_customers";
-                    $stmt = $mysqli->prepare($ret);
-                    $stmt->execute();
-                    $res = $stmt->get_result();
-                    while ($cust = $res->fetch_object()) {
-                        ?>
-                        <option><?php echo $cust->customer_name; ?></option>
-                    <?php } ?>
-                </select>
-            </div>
-            <div class="col-sm-2">
-                <input type="text" name="customer_id" readonly id="customerID" class="form-control">
-                <input type="hidden" name="order_id" value="<?php echo $orderid; ?>" class="form-control">
-            </div>
-            <div class="col-sm-2">
-                <input type="text" name="order_code" value="<?php echo $alpha; ?>-<?php echo $beta; ?>" class="form-control">
-            </div>
-            <div class="col-sm-2">
-                <input type="time" name="pick_up" value="" class="form-control">
-            </div>
-            <div class="col-sm-2">
-                <input type="hidden" name="order_id" value="<?= $orderid ?>">
-                <input type="submit" name="sub" class="btn btn-primary" value="Check Out">
-            </div>
-        </div>
-    </form>
-    <br>
-    <table class="table table-bordered">
-        <thead class="thead-dark">
-            <tr>
-                <th>Product</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Subtotal</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php $total = 0;
-            foreach ($_SESSION['cart'] as $item => $details): ?>
-                <tr>
-                    <td><?php echo $details['product_id']; ?></td>
-                    <td>₱ <?php echo $details['price']; ?></td>
-                    <td><?php echo $details['quantity']; ?></td>
-                    <td>₱ <?php echo number_format($details['quantity'] * $details['price'], 2); ?></td>
-                    <td>
-                        <form method="POST" class="d-inline">
-                            <input type="hidden" name="remove_product" value="<?php echo $item; ?>">
-                            <input type="number" name="remove_quantity" value="1" min="1"
-                                   max="<?php echo $details['quantity']; ?>"
-                                   class="form-control mb-2 d-inline" style="width: 60px;">
-                            <button type="submit" name="removed" class="btn btn-danger btn-sm">Remove</button>
+                        <form action="function.php" method="POST" id="checkoutForm">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <select class="form-control" name="customer_name" id="custName"
+                                        onChange="getCustomer(this.value)">
+                                        <option value="">Select Customer Name</option>
+                                        <?php
+                                        // Load All Customers
+                                        $ret = "SELECT * FROM rpos_customers";
+                                        $stmt = $mysqli->prepare($ret);
+                                        $stmt->execute();
+                                        $res = $stmt->get_result();
+                                        while ($cust = $res->fetch_object()) {
+                                            ?>
+                                            <option><?php echo $cust->customer_name; ?></option>
+                                        <?php } ?>
+                                    </select>
+                                </div>
+                                <div class="col-sm-2">
+                                    <input type="text" name="customer_id" readonly id="customerID" class="form-control">
+                                    <input type="hidden" name="order_id" value="<?php echo $orderid; ?>"
+                                        class="form-control">
+                                </div>
+                                <div class="col-sm-2">
+                                    <input type="text" name="order_code"
+                                        value="<?php echo $alpha; ?>-<?php echo $beta; ?>" class="form-control">
+                                </div>
+                                <div class="col-sm-2">
+                                    <input type="time" name="pick_up" value="" class="form-control">
+                                </div>
+                                <div class="col-sm-2">
+                                    <input type="hidden" name="order_id" value="<?= $orderid ?>">
+                                    <input type="submit" name="sub" class="btn btn-primary" value="Check Out">
+                                </div>
+                            </div>
                         </form>
-                    </td>
-                </tr>
-                <?php $total += $details['quantity'] * $details['price'];
-            endforeach; ?>
-        </tbody>
-    </table>
-    <h4 class="text-right">Total: ₱ <?php echo number_format($total, 2); ?></h4>
-</div>
+                        <br>
+                        <table class="table table-bordered">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Subtotal</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php $total = 0;
+                                foreach ($_SESSION['cart'] as $item => $details): ?>
+                                    <tr>
+                                        <td><?php echo $details['product_id']; ?></td>
+                                        <td>₱ <?php echo $details['price']; ?></td>
+                                        <td><?php echo $details['quantity']; ?></td>
+                                        <td>₱ <?php echo number_format($details['quantity'] * $details['price'], 2); ?></td>
+                                        <td>
+                                            <form method="POST" class="d-inline">
+                                                <input type="hidden" name="remove_product" value="<?php echo $item; ?>">
+                                                <input type="number" name="remove_quantity" value="1" min="1"
+                                                    max="<?php echo $details['quantity']; ?>"
+                                                    class="form-control mb-2 d-inline" style="width: 60px;">
+                                                <button type="submit" name="removed"
+                                                    class="btn btn-danger btn-sm">Remove</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <?php $total += $details['quantity'] * $details['price'];
+                                endforeach; ?>
+                            </tbody>
+                        </table>
+                        <h4 class="text-right">Total: ₱ <?php echo number_format($total, 2); ?></h4>
+                    </div>
 
-<script>
-    document.getElementById("checkoutForm").addEventListener("submit", function(event) {
-        var customerName = document.getElementById("custName").value;
+                    <script>
+                        document.getElementById("checkoutForm").addEventListener("submit", function (event) {
+                            var customerName = document.getElementById("custName").value;
 
-        // Check if customer name is selected
-        if (!customerName) {
-            event.preventDefault(); // Prevent form submission
-            Swal.fire({
-                title: 'Error!',
-                text: 'Please select a customer name.',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-        }
-    });
-</script>
+                            // Check if customer name is selected
+                            if (!customerName) {
+                                event.preventDefault(); // Prevent form submission
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: 'Please select a customer name.',
+                                    icon: 'error',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        });
+                    </script>
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -403,7 +407,7 @@ require_once('partials/_head.php');
                 return false; // Prevent form submission here, as it's handled after confirmation
             }
 
-            
+
         </script>
 
         <?php
@@ -451,7 +455,7 @@ require_once('partials/_head.php');
                 return false; // Prevent form submission here, as it's handled after confirmation
             }
 
-            
+
         </script>
 
         <!-- Bootstrap JS -->
@@ -463,6 +467,7 @@ require_once('partials/_head.php');
         <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
         <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
 
+        
 </body>
 
 </html>
