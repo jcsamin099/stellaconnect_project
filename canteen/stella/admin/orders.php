@@ -1,5 +1,3 @@
-orders
-
 <?php
 session_start();
 include('config/config.php');
@@ -7,14 +5,12 @@ include('config/code-generator.php');
 include('config/checklogin.php');
 check_login();
 
-include('config/config.php');
-
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (isset($_POST['product']) && isset($_POST['quantity']) && isset($_POST['price'])) {
+    if (isset($_POST['product'], $_POST['quantity'], $_POST['price'])) {
         $product = $_POST['product'];
         $product_id = $_POST['prod_id'];
         $image = $_POST['image'];
@@ -22,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $price = floatval($_POST['price']);
 
         if ($quantity > 0) {
-            if (isset($_SESSION['cart'][$product_id])) { // Use product_id as the key
+            if (isset($_SESSION['cart'][$product_id])) {
                 $_SESSION['cart'][$product_id]['quantity'] += $quantity;
             } else {
                 $_SESSION['cart'][$product_id] = [
@@ -34,7 +30,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 ];
             }
         }
-
     }
 
     if (isset($_POST['removed'])) {
@@ -45,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($_SESSION['cart'][$remove_product]['quantity'] > $remove_quantity) {
                 $_SESSION['cart'][$remove_product]['quantity'] -= $remove_quantity;
             } else {
-                unset($_SESSION['cart'][$remove_product]); // Remove the product completely if quantity is 0
+                unset($_SESSION['cart'][$remove_product]);
             }
         }
     }
@@ -84,11 +79,7 @@ require_once('partials/_head.php');
 
         productCards.forEach(card => {
             let title = card.querySelector('.card-title').innerText.toLowerCase();
-            if (title.includes(input)) {
-                card.style.display = "block";
-            } else {
-                card.style.display = "none";
-            }
+            card.style.display = title.includes(input) ? "block" : "none";
         });
     }
 </script>
@@ -102,17 +93,10 @@ require_once('partials/_head.php');
         let totalProducts = productCards.length;
         let totalPages = Math.ceil(totalProducts / productsPerPage);
 
-        if (page < 1) page = 1;
-        if (page > totalPages) page = totalPages;
-
-        currentPage = page;
+        currentPage = Math.max(1, Math.min(page, totalPages));
 
         productCards.forEach((card, index) => {
-            if (index >= (page - 1) * productsPerPage && index < page * productsPerPage) {
-                card.style.display = "block";
-            } else {
-                card.style.display = "none";
-            }
+            card.style.display = (index >= (currentPage - 1) * productsPerPage && index < currentPage * productsPerPage) ? "block" : "none";
         });
         updatePagination(totalPages);
     }
@@ -161,28 +145,17 @@ require_once('partials/_head.php');
 </style>
 
 <body>
-    <!-- Sidenav -->
-    <?php
-    require_once('partials/_sidebar.php');
-    ?>
-    <!-- Main content -->
+    <?php require_once('partials/_sidebar.php'); ?>
     <div class="main-content">
-        <!-- Top navbar -->
-        <?php
-        require_once('partials/_topnav.php');
-        ?>
-        <!-- Header -->
+        <?php require_once('partials/_topnav.php'); ?>
         <div style="background-image: url(assets/img/theme/restro00.jpg); background-size: cover;"
-            class="header  pb-8 pt-5 pt-md-8">
-            <span class="mask  opacity-8" style="background-color:#800000;"></span>
+            class="header pb-8 pt-5 pt-md-8">
+            <span class="mask opacity-8" style="background-color:#800000;"></span>
             <div class="container-fluid">
-                <div class="header-body">
-                </div>
+                <div class="header-body"></div>
             </div>
         </div>
-        <!-- Page content -->
         <div class="container-fluid mt--8">
-            <!-- Table -->
             <div class="row">
                 <div class="col">
                     <div class="card shadow">
@@ -200,7 +173,6 @@ require_once('partials/_head.php');
                                                 data-target="#cartModal" style="float:right;">
                                                 View Cart
                                             </button>
-
                                         </div>
                                     </div>
                                 </div>
@@ -211,12 +183,8 @@ require_once('partials/_head.php');
                                     while ($product = $result->fetch_assoc()): ?>
                                         <div class="col-md-3 product-card">
                                             <div class="card text-center">
-                                                <?php if ($product['prod_img']) { ?>
-                                                    <img src="assets/img/products/<?php echo $product['prod_img']; ?>"
-                                                        class="card-img-top" alt="<?php echo $product['prod_name']; ?>">
-                                                <?php } else { ?>
-                                                    <img src='assets/img/products/default.jpg' class="card-img-top">
-                                                <?php } ?>
+                                                <img src="assets/img/products/<?php echo $product['prod_img'] ?: 'default.jpg'; ?>"
+                                                    class="card-img-top" alt="<?php echo $product['prod_name']; ?>">
                                                 <div class="card-body">
                                                     <h5 class="card-title"><?php echo $product['prod_name']; ?></h5>
                                                     <p>Price: ₱ <?php echo $product['prod_price']; ?></p>
@@ -248,7 +216,6 @@ require_once('partials/_head.php');
                                             </div>
                                         </div>
                                     <?php endwhile; ?>
-
                                     <nav aria-label="Page navigation" class="mt-4">
                                         <ul class="pagination justify-content-center" id="pagination"></ul>
                                     </nav>
@@ -257,8 +224,6 @@ require_once('partials/_head.php');
                         </div>
                     </div>
                 </div>
-                <!-- Footer -->
-
             </div>
         </div>
 
@@ -278,15 +243,14 @@ require_once('partials/_head.php');
                                         onChange="getCustomer(this.value)">
                                         <option value="">Select Customer Name</option>
                                         <?php
-                                        // Load All Customers
                                         $ret = "SELECT * FROM rpos_customers";
                                         $stmt = $mysqli->prepare($ret);
                                         $stmt->execute();
                                         $res = $stmt->get_result();
                                         while ($cust = $res->fetch_object()) {
-                                            ?>
-                                            <option><?php echo $cust->customer_name; ?></option>
-                                        <?php } ?>
+                                            echo "<option>{$cust->customer_name}</option>";
+                                        }
+                                        ?>
                                     </select>
                                 </div>
                                 <div class="col-sm-2">
@@ -319,10 +283,10 @@ require_once('partials/_head.php');
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php $total = 0;
-                                foreach ($_SESSION['cart'] as $item => $details): ?>
-                                    <tr>
-                                        <td><?php echo $details['product_id']; ?></td>
+                                <?php $total = 0; ?>
+                                <?php foreach ($_SESSION['cart'] as $item => $details): ?>
+                                    <tr id="cart-item-<?php echo $item; ?>">
+                                        <td><?php echo $details['product_name']; ?></td>
                                         <td>₱ <?php echo $details['price']; ?></td>
                                         <td><?php echo $details['quantity']; ?></td>
                                         <td>₱ <?php echo number_format($details['quantity'] * $details['price'], 2); ?></td>
@@ -337,20 +301,18 @@ require_once('partials/_head.php');
                                             </form>
                                         </td>
                                     </tr>
-                                    <?php $total += $details['quantity'] * $details['price'];
-                                endforeach; ?>
+                                    <?php $total += $details['quantity'] * $details['price']; ?>
+                                <?php endforeach; ?>
                             </tbody>
                         </table>
                         <h4 class="text-right">Total: ₱ <?php echo number_format($total, 2); ?></h4>
                     </div>
-
                     <script>
                         document.getElementById("checkoutForm").addEventListener("submit", function (event) {
                             var customerName = document.getElementById("custName").value;
 
-                            // Check if customer name is selected
                             if (!customerName) {
-                                event.preventDefault(); // Prevent form submission
+                                event.preventDefault();
                                 Swal.fire({
                                     title: 'Error!',
                                     text: 'Please select a customer name.',
@@ -360,68 +322,19 @@ require_once('partials/_head.php');
                             }
                         });
                     </script>
-
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
         </div>
-
-        <script>
-            function addToCart(form) {
-                var productName = form.querySelector("input[name='product']").value;
-                var quantity = form.querySelector("input[name='quantity']").value;
-
-                // SweetAlert confirmation dialog
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: productName + " (x" + quantity + ") will be added to your cart.",
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, add it!',
-                    cancelButtonText: 'Cancel',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Show success message before submitting the form
-                        Swal.fire({
-                            title: 'Success!',
-                            text: productName + " (x" + quantity + ") has been added to your cart.",
-                            icon: 'success',
-                            timer: 3000, // Keep success message for 3 seconds
-                            showConfirmButton: false, // Hide the confirm button
-                        }).then(() => {
-                            // Submit the form after the SweetAlert finishes
-                            form.submit();
-                        });
-                    } else {
-                        // If the user cancels, show the cancel message
-                        Swal.fire(
-                            'Cancelled',
-                            'Your item was not added to the cart.',
-                            'error'
-                        );
-                    }
-                });
-
-                return false; // Prevent form submission here, as it's handled after confirmation
-            }
-
-
-        </script>
-
-        <?php
-        require_once('partials/_footer.php');
-        ?>
-        <!-- Argon Scripts -->
+        <?php require_once('partials/_footer.php'); ?>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
         <script>
             function addToCart(form) {
                 var productName = form.querySelector("input[name='product']").value;
                 var quantity = form.querySelector("input[name='quantity']").value;
 
-                // SweetAlert confirmation dialog
                 Swal.fire({
                     title: 'Are you sure?',
                     text: productName + " (x" + quantity + ") will be added to your cart.",
@@ -431,43 +344,29 @@ require_once('partials/_head.php');
                     cancelButtonText: 'Cancel',
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Show success message before submitting the form
                         Swal.fire({
                             title: 'Success!',
                             text: productName + " (x" + quantity + ") has been added to your cart.",
                             icon: 'success',
-                            timer: 2000, // Keep success message for  seconds
-                            showConfirmButton: false, // Hide the confirm button
+                            timer: 2000,
+                            showConfirmButton: false,
                         }).then(() => {
-                            // Submit the form after the SweetAlert finishes
                             form.submit();
                         });
                     } else {
-                        // If the user cancels, show the cancel message
-                        Swal.fire(
-                            'Cancelled',
-                            'Your item was not added to the cart.',
-                            'error'
-                        );
+                        Swal.fire('Cancelled', 'Your item was not added to the cart.', 'error');
                     }
                 });
 
-                return false; // Prevent form submission here, as it's handled after confirmation
+                return false;
             }
-
-
         </script>
-
-        <!-- Bootstrap JS -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-        <!-- DataTables JS -->
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
-        <!-- Responsive DataTables JS -->
         <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
         <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
-
-        
+    </div>
 </body>
 
 </html>

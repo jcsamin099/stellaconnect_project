@@ -17,7 +17,7 @@ if (isset($_GET['delete'])) {
 require_once('partials/_head.php');
 ?>
 
-<style>
+<style>  
   .custom-control-label {
     display: flex;
     justify-content: space-between;
@@ -156,55 +156,54 @@ require_once('partials/_head.php');
     }
 
     $(document).ready(function () {
-  $('.custom-control-input').change(function () {
-    var checkbox = $(this);
-    var prod_id = checkbox.data('prod-id');
-    var new_status = checkbox.prop('checked') ? '0' : '1'; // 0 = Available, 1 = Not Available
+      $('.custom-control-input').change(function () {
+        var checkbox = $(this);
+        var prod_id = checkbox.data('prod-id');
+        var new_status = checkbox.prop('checked') ? '0' : '1'; // 0 = Available, 1 = Not Available
 
-    $.ajax({
-      url: 'update_status.php',
-      method: 'POST',
-      data: { prod_id: prod_id, status: new_status },
-      success: function (response) {
-  if (typeof response === "string") {
-    response = JSON.parse(response); // Ensure it's an object
-  }
+        $.ajax({
+          url: 'update_status.php',
+          method: 'POST',
+          data: { prod_id: prod_id, status: new_status },
+          success: function (response) {
+            if (typeof response === "string") {
+              response = JSON.parse(response); // Ensure it's an object
+            }
 
-  if (response.success) {
+            if (response.success) {
 
-          // Find the corresponding label and update the text
-          var labelSpan = checkbox.closest('.custom-control').find('.status-label');
-          labelSpan.text(new_status === '1' ? 'Not Available' : 'Available');
+              // Find the corresponding label and update the text
+              var labelSpan = checkbox.closest('.custom-control').find('.status-label');
+              labelSpan.text(new_status === '1' ? 'Not Available' : 'Available');
 
-          Swal.fire({
-            icon: 'success',
-            title: 'Status Updated!',
-            text: 'Product status has been updated successfully.',
-            confirmButtonColor: '#3085d6'
-          });
-        } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Update Failed!',
-            text: response.message || 'There was an error updating the product status.',
-            confirmButtonColor: '#d33'
-          });
-        }
-      },
-      error: function () {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error!',
-          text: 'An error occurred while updating the status.',
-          confirmButtonColor: '#d33'
+              Swal.fire({
+                icon: 'success',
+                title: 'Status Updated!',
+                text: 'Product status has been updated successfully.',
+                confirmButtonColor: '#3085d6'
+              });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Update Failed!',
+                text: response.message || 'There was an error updating the product status.',
+                confirmButtonColor: '#d33'
+              });
+            }
+          },
+          error: function () {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error!',
+              text: 'An error occurred while updating the status.',
+              confirmButtonColor: '#d33'
+            });
+            // Revert checkbox state
+            checkbox.prop('checked', !checkbox.prop('checked'));
+          }
         });
-        // Revert checkbox state
-        checkbox.prop('checked', !checkbox.prop('checked'));
-      }
+      });
     });
-  });
-});
-
   </script>
 </body>
 </html>
