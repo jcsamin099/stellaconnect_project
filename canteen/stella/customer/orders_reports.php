@@ -36,18 +36,18 @@ require_once('partials/_head.php');
                 <div class="col">
                     <div class="card shadow">
                         <div class="card-header border-0">
-                            Orders Records
+                            <h1 class="text-2xl  font-bold">Orders Records</h1>
                         </div>
                         <div class="table-responsive">
                             <table class="table align-items-center table-flush">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th class="text-yellow" scope="col">Code</th>
+                                        <th class="text-black" scope="col">Code</th>
                                         <th scope="col">Customer</th>
                                         
                                         <th scope="col">Unit Price</th>
                                         <th scope="col">Status</th>
-                                        <th class="text-yellow" scope="col">Date</th>
+                                        <th class="text-black" scope="col">Date</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -62,7 +62,7 @@ require_once('partials/_head.php');
     while ($order = $res->fetch_object()) {
     ?>
     <tr>
-        <th class="text-yellow" scope="row"><?php echo $order->order_code; ?></th>
+        <th class="text-black" scope="row"><?php echo $order->order_code; ?></th>
         <td><?php echo $order->customer_name; ?></td>
         <!-- Removed Product column -->
         <td><?php echo $order->prod_price; ?></td>  <!-- Keep the price column -->
@@ -77,7 +77,7 @@ require_once('partials/_head.php');
             }
             ?>
         </td>
-        <td class="text-yellow">
+        <td class="text-black">
             <?php echo date('d/M/Y g:i', strtotime($order->created_at)); ?>
         </td>
     </tr>

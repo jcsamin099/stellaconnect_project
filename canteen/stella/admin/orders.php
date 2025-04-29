@@ -171,9 +171,10 @@ require_once('partials/_head.php');
                                         <div class="col-sm-6">
                                             <button type="button" class="btn btn-success mb-3" data-toggle="modal"
                                                 data-target="#cartModal" style="float:right;">
-                                                View Cart
+                                                <i class="ni ni-cart mr-2"></i>View Cart
                                             </button>
                                         </div>
+
                                     </div>
                                 </div>
                                 <div class="row" style="height: 500px;overflow-y:scroll;">
@@ -189,6 +190,7 @@ require_once('partials/_head.php');
                                                     <h5 class="card-title"><?php echo $product['prod_name']; ?></h5>
                                                     <p>Price: ₱ <?php echo $product['prod_price']; ?></p>
                                                     <form method="POST" onsubmit="return addToCart(this);">
+
                                                         <input type="hidden" name="prod_id"
                                                             value="<?php echo $product['prod_id']; ?>">
                                                         <input type="hidden" name="product"

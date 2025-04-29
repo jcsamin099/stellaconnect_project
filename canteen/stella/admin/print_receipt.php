@@ -65,13 +65,13 @@ while ($order = $res->fetch_object()) {
                                 <em>Date: <?php echo date('d/M/Y g:i', strtotime($order->created_at)); ?></em>
                             </p>
                             <p>
-                                <em class="text-yellow">Receipt #: <?php echo $order->order_code; ?></em>
+                                <em class="text-yellow">Sales Invoice #: <?php echo $order->order_code; ?></em>
                             </p>
                         </div>
                     </div>
                     <div class="row">
                         <div class="text-center">
-                            <h2>Receipt</h2>
+                            <h2>Sales Invoice</h2>
                         </div>
                         </span>
                         <table class="table table-bordered">

@@ -45,16 +45,18 @@ $conn->query($sql);
 
 
 
-    if($result1 == TRUE){
-        foreach ( $_SESSION["cart"] as $keys => $values) {
+switch ($result1) {
+    case TRUE:
+        foreach ($_SESSION["cart"] as $keys => $values) {
             unset($_SESSION["cart"][$keys]);
             echo '<script>window.open("orders.php?success_id=1","_self")</script>';
-            
-            }
-        
-    }else{
+
+        }
+        break;
+    default:
         echo 'fail';
-    }
+        break;
+}
 
 
 

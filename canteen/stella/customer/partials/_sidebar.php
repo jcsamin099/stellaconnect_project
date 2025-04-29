@@ -80,12 +80,12 @@ while ($customer = $res->fetch_object()) {
       <ul class="navbar-nav mb-md-3">
         <li class="nav-item bg-white" style="margin-top:10px;">
           <a class="nav-link <?php if(basename($_SERVER['PHP_SELF']) == 'orders_reports.php') echo 'active'; ?>" href="orders_reports.php">
-            <i class="fas fa-shopping-basket"></i> My Orders
+            <i class="fas fa-shopping-basket"></i> Orders Records
           </a>
         </li>
         <li class="nav-item bg-white" style="margin-top:10px;">
           <a class="nav-link <?php if(basename($_SERVER['PHP_SELF']) == 'payments_reports.php') echo 'active'; ?>" href="payments_reports.php">
-            <i class="fas fa-funnel-dollar"></i> Payments Method
+            <i class="fas fa-funnel-dollar"></i> Payments Reports
           </a>
         </li>
       </ul>

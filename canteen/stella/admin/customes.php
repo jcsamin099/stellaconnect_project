@@ -75,9 +75,6 @@ require_once('partials/_head.php');
                       <td><?php echo $cust->customer_phoneno; ?></td>
                       <td><?php echo $cust->customer_email; ?></td>
                       <td>
-                        <a href="customes.php?delete=<?php echo $cust->customer_id; ?>"
-                          onclick="return confirm('Are you sure you want to delete this product?');">
-                      <td>
                         <button class="btn btn-sm btn-danger"
                           onclick="confirmDelete('<?php echo $cust->customer_id; ?>')">
                           <i class="fas fa-trash"></i>
@@ -92,6 +89,7 @@ require_once('partials/_head.php');
                         </a>
                       </td>
                     </tr>
+
                   <?php } ?>
                 </tbody>
               </table>

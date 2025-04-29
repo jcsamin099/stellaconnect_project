@@ -32,17 +32,17 @@ require_once('partials/_head.php');
                 <div class="col">
                     <div class="card shadow">
                         <div class="card-header border-0">
-                            Payment Reports
+                            <h1 class="text-2xl font-bold">Payment Reports</h1>
                         </div>
                         <div class="table-responsive">
                             <table class="table align-items-center table-flush">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th class="text-yellow" scope="col">Payment Code</th>
+                                        <th class="text-black" scope="col">Payment Code</th>
                                         <th scope="col">Payment Method</th>
-                                        <th class="text-yellow" scope="col">Order Code</th>
+                                        <th class="text-black" scope="col">Order Code</th>
                                         <th scope="col">Amount Paid</th>
-                                        <th class="text-yellow" scope="col">Date Paid</th>
+                                        <th class="text-black" scope="col">Date Paid</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -55,19 +55,19 @@ require_once('partials/_head.php');
                                     while ($payment = $res->fetch_object()) {
                                     ?>
                                         <tr>
-                                            <th class="text-yellow" scope="row">
+                                            <th class="text-black" scope="row">
                                                 <?php echo $payment->pay_code; ?>
                                             </th>
                                             <th scope="row">
                                                 <?php echo $payment->pay_method; ?>
                                             </th>
-                                            <td class="text-yellow">
+                                            <td class="text-black">
                                                 <?php echo $payment->order_code; ?>
                                             </td>
                                             <td>
                                                 <?php echo $payment->pay_amt; ?>
                                             </td>
-                                            <td class="text-yellow">
+                                            <td class="text-black">
                                                 <?php echo date('d/M/Y g:i', strtotime($payment->created_at)) ?>
                                             </td>
                                         </tr>

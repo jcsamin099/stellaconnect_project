@@ -32,7 +32,7 @@ require_once('partials/_head.php');
                 <div class="col">
                     <div class="card shadow">
                         <div class="card-header border-0">
-                            Paid Orders
+                            <h1 class="text-2xl font-bold">Paid Orders</h1>
                         </div>
                         <div class="table-responsive">
                             <table class="table align-items-center table-flush">
@@ -64,7 +64,7 @@ require_once('partials/_head.php');
                                                 <a target="_blank" href="print_receipt.php?order_code=<?php echo $order->order_code; ?>">
                                                     <button class="btn btn-sm btn-primary">
                                                         <i class="fas fa-print"></i>
-                                                        Print Receipt
+                                                        Print Sales Invoice
                                                     </button>
                                                 </a>
                                             </td>

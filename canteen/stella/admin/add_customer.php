@@ -23,13 +23,12 @@ if (isset($_POST['addCustomer'])) {
     $postStmt->execute();
 
     if ($postStmt) {
-      $success = true; // Flag to trigger SweetAlert
+      $success = true; // Used to trigger Swal
     } else {
       $err = "Please Try Again Or Try Later";
     }
   }
 }
-
 require_once('partials/_head.php');
 ?>
 
@@ -57,35 +56,39 @@ require_once('partials/_head.php');
         <div class="col">
           <div class="card shadow">
             <div class="card-header border-0">
-              <h3>Please Fill All Fields</h3>
+              <h1 class="text-2xl"><strong>Create New User</strong></h1>
             </div>
             <div class="card-body">
-              <form method="POST">
+              <h3>Please Fill All Fields</h3>
+              <form method="POST" id="addCustomerForm">
                 <div class="form-row">
                   <div class="col-md-6">
                     <label>Customer Name</label>
-                    <input type="text" name="customer_name" class="form-control">
+                    <input type="text" name="customer_name" class="form-control" required placeholder="Enter Name">
                     <input type="hidden" name="customer_id" value="<?php echo $cus_id; ?>" class="form-control">
                   </div>
                   <div class="col-md-6">
                     <label>Customer Phone Number</label>
-                    <input type="text" name="customer_phoneno" class="form-control">
+                    <input type="text" name="customer_phoneno" class="form-control" required
+                      placeholder="Enter Phone Number">
                   </div>
                 </div>
                 <hr>
                 <div class="form-row">
                   <div class="col-md-6">
                     <label>Customer Email</label>
-                    <input type="email" name="customer_email" class="form-control">
+                    <input type="email" name="customer_email" class="form-control" required placeholder="Enter Email">
                   </div>
                   <div class="col-md-6">
                     <label>Customer Password</label>
-                    <input type="password" name="customer_password" class="form-control">
+                    <input type="password" name="customer_password" class="form-control" required
+                      placeholder="Enter Password">
                   </div>
                 </div>
                 <hr>
                 <div class="form-row">
                   <div class="col-md-6">
+                    <label>Role</label>
                     <select name="role" class="form-control" required>
                       <option value="">Select Customer Role</option>
                       <option value="0">Student</option>
@@ -110,24 +113,54 @@ require_once('partials/_head.php');
     </div>
   </div>
 
+  <!-- Argon Scripts -->
+  <?php require_once('partials/_scripts.php'); ?>
+
   <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+  <!-- SweetAlert Trigger -->
   <?php if (isset($success) && $success): ?>
     <script>
       Swal.fire({
-        title: 'Success!',
-        text: 'Customer successfully added.',
         icon: 'success',
-        confirmButtonText: 'OK'
-      }).then(() => {
-        window.location.href = "customes.php";
+        title: 'Customer Added!',
+        text: 'The new customer has been successfully registered.',
+        allowOutsideClick: false,
+        showEscapeButton: false, 
+        showCancelButton: true,
+        confirmButtonText: 'Go to Customers', // Confirm button text
+        cancelButtonText: 'Stay Here', // Cancel button text
+        reverseButtons: false // This reverses the buttons to keep "Yes" on the left
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: 'The user created successfully!',
+            allowOutsideClick: false,
+            confirmButtonText: 'OK'
+          }).then(() => {
+            window.location.href = 'customes.php'; // Make sure this is the correct page
+          });
+        }
+      });
+    </script>
+<?php endif; ?>
+
+
+  <?php if (isset($err)): ?>
+    <script>
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: '<?= $err ?>',
+        allowOutsideClick: false,
+        allowEscapeClick: false,
+        confirmButtonText: 'Retry'
       });
     </script>
   <?php endif; ?>
-
-  <!-- Argon Scripts -->
-  <?php require_once('partials/_scripts.php'); ?>
 </body>
 
 </html>

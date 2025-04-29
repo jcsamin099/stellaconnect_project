@@ -7,25 +7,31 @@ $stmt->execute();
 $res = $stmt->get_result();
 while ($admin = $res->fetch_object()) {
 
-?>
+    ?>
     <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
         <div class="container-fluid">
             <!-- Brand -->
-            <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="dashboard.php"><?php echo $admin->admin_name; ?> Dashboard</a>
+            <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"
+                href="dashboard.php"><?php echo $admin->admin_name; ?> Dashboard</a>
             <!-- Form -->
 
             <!-- User -->
             <ul class="navbar-nav align-items-center d-none d-md-flex">
                 <li class="nav-item dropdown">
-                    <a class="nav-link pr-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a class="nav-link pr-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false">
                         <div class="media align-items-center">
-                            <span class="avatar avatar-sm rounded-circle">
-                                <img alt="Image placeholder" src="assets/img/theme/user-a-min.png">
+                            <span class="avatar avatar-sm rounded-circle"
+                                style="height: 40px; width: 40px; overflow: hidden;border: 1.7px solid black;">
+                                <img alt="Image placeholder"
+                                    src="assets/img/theme/<?php echo $admin->admin_profile_pic ? htmlspecialchars($admin->admin_profile_pic) : 'user-a-min.png'; ?>?<?php echo time(); ?>"
+                                    style="height: 100%; width: 100%; object-fit: cover; object-position: center;">
                             </span>
                             <div class="media-body ml-2 d-none d-lg-block">
-                                <span class="mb-0 text-sm  font-weight-bold"><?php echo $admin->admin_name; ?></span>
+                                <span class="mb-0 text-sm font-weight-bold"><?php echo $admin->admin_name; ?></span>
                             </div>
                         </div>
+
                     </a>
                     <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-right">
                         <div class=" dropdown-header noti-title">
