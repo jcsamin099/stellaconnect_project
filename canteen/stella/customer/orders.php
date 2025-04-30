@@ -5,15 +5,14 @@ include('config/code-generator.php');
 include('config/checklogin.php');
 check_login();
 
-include('config/config.php');
-
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['product']) && isset($_POST['quantity']) && isset($_POST['price'])) {
-        $product = $_POST['product'];
+        $product_id = $_POST['prod_id'];
+
         $product_id = $_POST['prod_id'];
         $image = $_POST['image'];
         $quantity = intval($_POST['quantity']);
@@ -162,17 +161,16 @@ require_once('partials/_head.php');
                             <div class="container mt-5">
                                 <div class="container-fluid">
                                     <h2 class="text-center">Order Form</h2>
-                                    <div class="row">
-                                        <div class="col-sm-4">
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-md-6">
                                             <input type="text" id="searchBox" onkeyup="filterProducts()"
-                                                class="form-control mb-3" placeholder="Search for products...">
+                                                class="form-control" placeholder="Search for products...">
                                         </div>
-                                        <div class="col-sm-6">
-                                            <button type="button" class="btn btn-success mb-3" data-toggle="modal"
-                                                data-target="#cartModal" style="float:right;">
-                                                View Cart
+                                        <div class="col-md-6 text-md-right mt-2 mt-md-0">
+                                            <button type="button" class="btn btn-success" data-toggle="modal"
+                                                data-target="#cartModal">
+                                                <i class="ni ni-cart mr-2"></i>View Cart
                                             </button>
-
                                         </div>
                                     </div>
                                 </div>
@@ -351,48 +349,48 @@ require_once('partials/_head.php');
         </div>
 
         <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const checkoutButton = document.getElementById('checkoutButton');
+            document.addEventListener("DOMContentLoaded", function () {
+                const checkoutButton = document.getElementById('checkoutButton');
 
-    checkoutButton.addEventListener('click', function (event) {
-        event.preventDefault(); // Stop normal form submission
+                checkoutButton.addEventListener('click', function (event) {
+                    event.preventDefault(); // Stop normal form submission
 
-        // Check if the cart is empty
-        let cartTableBody = document.querySelector('.modal-body table tbody');
-        if (!cartTableBody || cartTableBody.children.length === 0) {
-            Swal.fire({
-                title: 'Your cart is empty!',
-                text: 'Please add some food items before checking out.',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-            return;
-        }
-
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You are about to submit your order and proceed to payments.",
-            icon: 'info',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, Check Out!',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: 'Order Submitted!',
-                    text: 'Redirecting you to payment page...',
-                    icon: 'success',
-                    timer: 2000,
-                    showConfirmButton: false,
-                    didClose: () => {
-                        window.location.href = 'payments.php'; // <-- redirect!
+                    // Check if the cart is empty
+                    let cartTableBody = document.querySelector('.modal-body table tbody');
+                    if (!cartTableBody || cartTableBody.children.length === 0) {
+                        Swal.fire({
+                            title: 'Your cart is empty!',
+                            text: 'Please add some food items before checking out.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                        return;
                     }
+
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "You are about to submit your order and proceed to payments.",
+                        icon: 'info',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, Check Out!',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Order Submitted!',
+                                text: 'Redirecting you to payment page...',
+                                icon: 'success',
+                                timer: 2000,
+                                showConfirmButton: false,
+                                didClose: () => {
+                                    window.location.href = 'payments.php'; // <-- redirect!
+                                }
+                            });
+                        }
+                    });
                 });
-            }
-        });
-    });
-});
-</script>
+            });
+        </script>
 
 
 

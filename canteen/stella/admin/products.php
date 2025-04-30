@@ -14,6 +14,13 @@ if (isset($_GET['delete'])) {
   $stmt->close();
   $deleted = true;
 }
+
+// Handling Search functionality
+$search_query = '';
+if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
+  $search_query = '%' . trim($_GET['search']) . '%';
+}
+
 require_once('partials/_head.php');
 ?>
 
@@ -38,7 +45,6 @@ require_once('partials/_head.php');
   }
 </style>
 
-
 <body>
   <!-- Sidenav -->
   <?php require_once('partials/_sidebar.php'); ?>
@@ -58,14 +64,19 @@ require_once('partials/_head.php');
 
     <!-- Page content -->
     <div class="container-fluid mt--8">
-      <!-- Table -->
       <div class="row">
         <div class="col">
           <div class="card shadow">
-            <div class="card-header border-0">
+            <div class="card-header border-0 d-flex justify-content-between align-items-center">
               <a href="add_product.php" class="btn btn-outline-success">
                 <i class="fas fa-utensils"></i> Add New Product
               </a>
+
+              <!-- Search Form -->
+              <form method="GET" class="form-inline">
+                <input type="text" name="search" class="form-control mr-sm-2" placeholder="Search product name..." value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
+                <button type="submit" class="btn btn-outline-primary">Search</button>
+              </form>
             </div>
             <div class="table-responsive">
               <table class="table align-items-center table-flush">
@@ -73,7 +84,7 @@ require_once('partials/_head.php');
                   <tr>
                     <th scope="col">Image</th>
                     <th scope="col">Product Code</th>
-                    <th scope="col">Name</th>
+                    <th scope="col">Product Name</th>
                     <th scope="col">Price</th>
                     <th scope="col">Status</th>
                     <th scope="col">Actions</th>
@@ -81,44 +92,55 @@ require_once('partials/_head.php');
                 </thead>
                 <tbody>
                   <?php
-                  $ret = "SELECT * FROM rpos_products";
-                  $stmt = $mysqli->prepare($ret);
+                  // Modified SQL query to handle search functionality
+                  if ($search_query) {
+                    $ret = "SELECT * FROM rpos_products WHERE prod_name LIKE ? OR prod_code LIKE ? OR prod_price LIKE ?";
+                    $stmt = $mysqli->prepare($ret);
+                    $stmt->bind_param('sss', $search_query, $search_query, $search_query);
+                  } else {
+                    $ret = "SELECT * FROM rpos_products";
+                    $stmt = $mysqli->prepare($ret);
+                  }
                   $stmt->execute();
                   $res = $stmt->get_result();
                   while ($prod = $res->fetch_object()) {
                   ?>
                     <tr>
-                      <td>
-                        <?php
-                        $imgSrc = $prod->prod_img ? "assets/img/products/$prod->prod_img" : "assets/img/products/default.jpg";
-                        echo "<img src='$imgSrc' height='60' width='60' class='img-thumbnail'>";
-                        ?>
-                      </td>
-                      <td><?php echo $prod->prod_code; ?></td>
-                      <td><?php echo $prod->prod_name; ?></td>
-                      <td><?php echo $prod->prod_price; ?></td>
-                      <td>
-                        <div class="custom-control custom-switch">
-                          <input type="checkbox" class="custom-control-input" id="prodStatusSwitch<?php echo $prod->prod_id; ?>" 
-                                 data-prod-id="<?php echo $prod->prod_id; ?>" name="status" value="0"
-                                 <?php echo ($prod->status == 0) ? 'checked' : ''; ?>>
-                          <label class="custom-control-label" for="prodStatusSwitch<?php echo $prod->prod_id; ?>">
-                            <span class="status-label"><?php echo ($prod->status == 0) ? 'Available' : 'Not Available'; ?></span>
-                          </label>
-                        </div>
-                      </td>
-                      <td>
-                        <button class="btn btn-sm btn-danger" onclick="confirmDelete('<?php echo $prod->prod_id; ?>')">
-                          <i class="fas fa-trash"></i> Delete
-                        </button>
-                        <a href="update_product.php?update=<?php echo $prod->prod_id; ?>">
-                          <button class="btn btn-sm btn-primary">
-                            <i class="fas fa-edit"></i> Update
-                          </button>
-                        </a>
-                      </td>
-                    </tr>
+  <td>
+    <?php
+    // Display product image
+    $imgSrc = $prod->prod_img ? "assets/img/products/$prod->prod_img" : "assets/img/products/default.jpg";
+    echo "<img src='$imgSrc' height='60' width='60' class='img-thumbnail'>";
+    ?>
+  </td>
+  <td><?php echo $prod->prod_code; ?></td>
+  <td><?php echo $prod->prod_name; ?></td>
+  <td><?php echo $prod->prod_price; ?></td>
+  <td>
+    <div class="custom-control custom-switch">
+      <!-- Add data-prod-id to keep track of product id in the JS -->
+      <input type="checkbox" class="custom-control-input" id="prodStatusSwitch<?php echo $prod->prod_id; ?>" 
+             data-prod-id="<?php echo $prod->prod_id; ?>" name="status" value="0"
+             <?php echo ($prod->status == 0) ? 'checked' : ''; ?>>
+      <label class="custom-control-label" for="prodStatusSwitch<?php echo $prod->prod_id; ?>">
+        <span class="status-label"><?php echo ($prod->status == 0) ? 'Available' : 'Not Available'; ?></span>
+      </label>
+    </div>
+  </td>
+  <td>
+    <button class="btn btn-sm btn-danger" onclick="confirmDelete('<?php echo $prod->prod_id; ?>')">
+      <i class="fas fa-trash"></i> Delete
+    </button>
+    <a href="update_product.php?update=<?php echo $prod->prod_id; ?>">
+      <button class="btn btn-sm btn-primary">
+        <i class="fas fa-edit"></i> Update
+      </button>
+    </a>
+  </td>
+</tr>
+
                   <?php } ?>
+                  <?php $stmt->close(); ?>
                 </tbody>
               </table>
             </div>

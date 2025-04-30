@@ -83,19 +83,34 @@ if (isset($_GET['ID'])) {
 
         <!-- Page content -->
         <div class="container-fluid mt--8">
+
+
             <!-- Table -->
             <div class="row">
                 <div class="col">
                     <div class="card shadow">
-                        <div class="card-header border-0">
-                            <h1 class="font-extrabold">Orders Records</h1>
+                        <div class="flex flex-row justify-between items-center">
+                            <div class="card-header border-0">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                    <h1 class="font-extrabold mb-3 mb-md-0">Orders Records</h1>
+
+                                    <!-- Search Bar -->
+                                    <form action="orders_reports.php" method="GET" class="form-inline">
+                                        <input type="text" name="search" class="form-control mr-2"
+                                            placeholder="Search by Code or Name"
+                                            value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>" />
+                                        <button type="submit" class="btn btn-outline-primary">Search</button>
+                                    </form>
+                                </div>
+                            </div>
+
                         </div>
                         <div class="table-responsive">
                             <table class="table align-items-center table-flush">
                                 <thead class="thead-light">
                                     <tr>
                                         <th class="" scope="col">Code</th>
-                                        <th scope="col">Customer</th>
+                                        <th scope="col">Name</th>
                                         <th scope="col">Payment Method</th>
                                         <th scope="col">Payment Reference</th>
                                         <th scope="col">Total Price</th>
@@ -106,7 +121,13 @@ if (isset($_GET['ID'])) {
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $ret = "SELECT * FROM rpos_orders ORDER BY `created_at` DESC";
+                                    $search = isset($_GET['search']) ? $_GET['search'] : '';
+                                    $search_query = "";
+                                    if ($search) {
+                                        $search_query = "WHERE order_code LIKE '%$search%' OR customer_name LIKE '%$search%'";
+                                    }
+
+                                    $ret = "SELECT * FROM rpos_orders $search_query ORDER BY `created_at` DESC";
                                     $stmt = $mysqli->prepare($ret);
                                     $stmt->execute();
                                     $res = $stmt->get_result();
@@ -216,7 +237,8 @@ if (isset($_GET['ID'])) {
                                                                             ?>
                                                                             <tr>
                                                                                 <td colspan="3" class="text-right">
-                                                                                    <b>TOTAL</b></td>
+                                                                                    <b>TOTAL</b>
+                                                                                </td>
                                                                                 <td class="text-right">&#8369;
                                                                                     <?php echo number_format($order->prod_price, 2); ?>
                                                                                 </td>

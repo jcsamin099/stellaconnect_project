@@ -53,7 +53,8 @@ $stmt->close();
     require_once('partials/_topnav.php');
     ?>
     <!-- Header -->
-    <div style="background-image: url(assets/img/theme/restro00.jpg); background-size: cover;" class="header  pb-8 pt-5 pt-md-8">
+    <div style="background-image: url(assets/img/theme/restro00.jpg); background-size: cover;"
+      class="header  pb-8 pt-5 pt-md-8">
       <span class="mask  opacity-8" style="background-color:#800000;"></span>
       <div class="container-fluid">
         <div class="header-body">
@@ -76,7 +77,7 @@ $stmt->close();
                 </div>
               </div>
             </div>
-			
+
             <div class="col-xl-3 col-lg-6">
               <div class="card card-stats mb-4 mb-xl-0">
                 <div class="card-body">
@@ -121,7 +122,7 @@ $stmt->close();
                     </div>
                     <div class="col-auto">
                       <div class="icon icon-shape bg-green text-white rounded-circle shadow">
-                      ₱
+                        ₱
                       </div>
                     </div>
                   </div>
@@ -154,11 +155,11 @@ $stmt->close();
                   <tr>
                     <th class="" scope="col"><b>Code</b></th>
                     <th scope="col"><b>Customer</b></th>
-                    <th class="" scope="col"><b>Product</b></th>
+                    
                     <th scope="col"><b>Unit Price</b></th>
-                 
+
                     <th scope="col"><b>Total</b></th>
-                    <th scop="col"><b>Status</b></th>
+                    <th scope="col"><b>Status</b></th>
                     <th class="" scope="col"><b>Date</b></th>
                   </tr>
                 </thead>
@@ -171,21 +172,21 @@ $stmt->close();
                   while ($order = $res->fetch_object()) {
                     $total = ($order->prod_price);
 
-                  ?>
+                    ?>
                     <tr>
                       <th class="" scope="row"><?php echo $order->order_code; ?></th>
                       <td><?php echo $order->customer_name; ?></td>
-                      <td class=""><?php echo $order->prod_name; ?></td>
+                      
                       <td><?php echo $order->prod_price; ?></td>
-                  
+
                       <td><?php echo $total; ?></td>
                       <td><?php if ($order->order_status == '') {
-                                                    echo "<span class='badge badge-danger'>Not Paid</span>";
-                                                } elseif ($order->order_status == 'Paid') {
-                                                    echo "<span class='badge badge-success'>$order->order_status</span>";
-                                                }else{
-                                                    echo "<span class='badge badge-info'>$order->order_status</span>";
-                                                } ?></td>
+                        echo "<span class='badge badge-danger'>Not Paid</span>";
+                      } elseif ($order->order_status == 'Paid') {
+                        echo "<span class='badge badge-success'>$order->order_status</span>";
+                      } else {
+                        echo "<span class='badge badge-info'>$order->order_status</span>";
+                      } ?></td>
                       <td class=""><?php echo date('d/M/Y g:i', strtotime($order->created_at)); ?></td>
                     </tr>
                   <?php } ?>
@@ -195,59 +196,51 @@ $stmt->close();
           </div>
         </div>
       </div>
-		
+
       <div class="row mt-5">
-        <div class="col-xl-12">
-          <div class="card shadow">
-            <div class="card-header border-0">
-              <div class="row align-items-center">
-                <div class="col">
-                  <h3 class="mb-0">Recent Payments</h3>
-                </div>
-                <div class="col text-right">
-                  <a href="payments_reports.php" class="btn btn-sm btn-primary">See all</a>
-                </div>
-              </div>
-            </div>
-            <div class="table-responsive">
-              <!-- Projects table -->
-              <table class="table align-items-center table-flush">
-                <thead class="thead-light">
-                  <tr>
-                    <th class="" scope="col"><b>Code</b></th>
-                    <th scope="col"><b>Amount</b></th>
-                    <th class='' scope="col"><b>Order Code</b></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <?php
-                  $ret = "SELECT * FROM   rpos_payments   ORDER BY `rpos_payments`.`created_at` DESC LIMIT 7 ";
-                  $stmt = $mysqli->prepare($ret);
-                  $stmt->execute();
-                  $res = $stmt->get_result();
-                  while ($payment = $res->fetch_object()) {
-                  ?>
-                    <tr>
-                      <th class="" scope="row">
-                        <?php echo $payment->pay_code; ?>
-                      </th>
-                      <td>
-                        <?php echo $payment->pay_amt; ?>
-                      </td>
-                      <td class=''>
-                        <?php echo $payment->order_code; ?>
-                      </td>
-                    </tr>
-                  <?php } ?>
-                </tbody>
-              </table>
-            </div>
+  <div class="col-xl-12">
+    <div class="card shadow">
+      <div class="card-header border-0">
+        <div class="row align-items-center">
+          <div class="col">
+            <h3 class="mb-0">Recent Payments</h3>
+          </div>
+          <div class="col text-right">
+            <a href="payments_reports.php" class="btn btn-sm btn-primary">See all</a>
           </div>
         </div>
       </div>
-      <!-- Footer -->
-      <?php require_once('partials/_footer.php'); ?>
+      <div class="table-responsive">
+        <!-- Payments table -->
+        <table class="table align-items-center table-flush">
+          <thead class="thead-light">
+            <tr>
+              <th scope="col"><b>Payment Code</b></th>
+              <th scope="col"><b>Amount</b></th>
+              <th scope="col"><b>Order Code</b></th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php
+            $ret = "SELECT * FROM rpos_payments ORDER BY created_at DESC LIMIT 7";
+            $stmt = $mysqli->prepare($ret);
+            $stmt->execute();
+            $res = $stmt->get_result();
+            while ($payment = $res->fetch_object()) {
+            ?>
+              <tr>
+                <td><?php echo $payment->pay_code; ?></td>
+                <td>₱<?php echo number_format($payment->pay_amt, 2); ?></td>
+                <td><?php echo $payment->order_code; ?></td>
+              </tr>
+            <?php } ?>
+          </tbody>
+        </table>
+      </div>
     </div>
+  </div>
+</div>
+
   </div>
   <!-- Argon Scripts -->
   <?php

@@ -162,9 +162,9 @@ require_once('partials/_head.php');
                                     <div class="card-profile-image">
                                         <a href="#">
                                             <img src="../admin/assets/img/theme/<?php echo $customer->customer_profile_pic ? htmlspecialchars($customer->customer_profile_pic) : 'user-a-min.png'; ?>?<?php echo time(); ?>"
-                                                class="rounded-circle"
+                                                class="rounded-circle bg-gray" alt="Profile Picture"
                                                 style="object-fit: cover; width: 150px; height: 150px; border: 3px solid #fff;">
-
+                                        </a>
                                         </a>
                                     </div>
                                 </div>

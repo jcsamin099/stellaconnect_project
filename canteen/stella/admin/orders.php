@@ -59,6 +59,49 @@ if (isset($_GET['success_id'])) {
 
 require_once('partials/_head.php');
 ?>
+
+<?php
+// Get the cart items
+$total = 0;
+foreach ($_SESSION['cart'] as $item => $details):
+    $prod_id = $details['product_id'];
+    // Fetch the product's availability status
+    $sql = "SELECT prod_status FROM rpos_products WHERE prod_id = ?";
+    $stmt = $mysqli->prepare($sql);
+    $stmt->bind_param("i", $prod_id);
+    $stmt->execute();
+    $stmt->store_result();
+    $stmt->bind_result($prod_status);
+    $stmt->fetch();
+    $is_available = ($prod_status == 'Available');
+?>
+<tr id="cart-item-<?php echo $item; ?>" class="<?php echo !$is_available ? 'text-muted' : ''; ?>">
+    <td>
+        <?php echo $details['product_name']; ?>
+        <?php if (!$is_available): ?>
+            <span class="text-danger"> (Not Available)</span>
+        <?php endif; ?>
+    </td>
+    <td>₱ <?php echo $details['price']; ?></td>
+    <td><?php echo $details['quantity']; ?></td>
+    <td>₱ <?php echo number_format($details['quantity'] * $details['price'], 2); ?></td>
+    <td>
+        <?php if ($is_available): ?>
+            <form method="POST" class="d-inline">
+                <input type="hidden" name="remove_product" value="<?php echo $item; ?>">
+                <input type="number" name="remove_quantity" value="1" min="1" max="<?php echo $details['quantity']; ?>" class="form-control mb-2 d-inline" style="width: 60px;">
+                <button type="submit" name="removed" class="btn btn-danger btn-sm">Remove</button>
+            </form>
+        <?php else: ?>
+            <button class="btn btn-secondary btn-sm" disabled>Remove</button>
+        <?php endif; ?>
+    </td>
+</tr>
+<?php 
+    $total += $details['quantity'] * $details['price'];
+endforeach;
+?>
+
 <style>
     .card-img-top {
         width: 100%;
@@ -163,19 +206,19 @@ require_once('partials/_head.php');
                             <div class="container mt-5">
                                 <div class="container-fluid">
                                     <h2 class="text-center">Order Form</h2>
-                                    <div class="row">
-                                        <div class="col-sm-4">
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-md-6">
                                             <input type="text" id="searchBox" onkeyup="filterProducts()"
-                                                class="form-control mb-3" placeholder="Search for products...">
+                                                class="form-control" placeholder="Search for products...">
                                         </div>
-                                        <div class="col-sm-6">
-                                            <button type="button" class="btn btn-success mb-3" data-toggle="modal"
-                                                data-target="#cartModal" style="float:right;">
+                                        <div class="col-md-6 text-md-right mt-2 mt-md-0">
+                                            <button type="button" class="btn btn-success" data-toggle="modal"
+                                                data-target="#cartModal">
                                                 <i class="ni ni-cart mr-2"></i>View Cart
                                             </button>
                                         </div>
-
                                     </div>
+
                                 </div>
                                 <div class="row" style="height: 500px;overflow-y:scroll;">
                                     <?php
