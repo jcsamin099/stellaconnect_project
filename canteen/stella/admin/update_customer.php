@@ -52,10 +52,11 @@ require_once('partials/_head.php');
     $stmt->execute();
     $res = $stmt->get_result();
     while ($cust = $res->fetch_object()) {
-    ?>
+      ?>
       <!-- Header -->
-      <div style="background-image: url(assets/img/theme/restro00.jpg); background-size: cover;" class="header  pb-8 pt-5 pt-md-8">
-      <span class="mask  opacity-8" style="background-color:#800000;"></span>
+      <div style="background-image: url(assets/img/theme/restro00.jpg); background-size: cover;"
+        class="header  pb-8 pt-5 pt-md-8">
+        <span class="mask  opacity-8" style="background-color:#800000;"></span>
         <div class="container-fluid">
           <div class="header-body">
           </div>
@@ -71,22 +72,25 @@ require_once('partials/_head.php');
                 <h3>Please Fill All Fields</h3>
               </div>
               <div class="card-body">
-                <form method="POST">
+                <form method="POST" id="updateCustomerForm">
                   <div class="form-row">
                     <div class="col-md-6">
                       <label>Customer Name</label>
-                      <input type="text" name="customer_name" value="<?php echo $cust->customer_name; ?>" class="form-control">
+                      <input type="text" name="customer_name" value="<?php echo $cust->customer_name; ?>"
+                        class="form-control">
                     </div>
                     <div class="col-md-6">
                       <label>Customer Phone Number</label>
-                      <input type="text" name="customer_phoneno" value="<?php echo $cust->customer_phoneno; ?>" class="form-control" value="">
+                      <input type="text" name="customer_phoneno" value="<?php echo $cust->customer_phoneno; ?>"
+                        class="form-control" value="">
                     </div>
                   </div>
                   <hr>
                   <div class="form-row">
                     <div class="col-md-6">
                       <label>Customer Email</label>
-                      <input type="email" name="customer_email" value="<?php echo $cust->customer_email; ?>" class="form-control" value="">
+                      <input type="email" name="customer_email" value="<?php echo $cust->customer_email; ?>"
+                        class="form-control" value="">
                     </div>
                     <div class="col-md-6">
                       <label>Customer Password</label>
@@ -98,9 +102,9 @@ require_once('partials/_head.php');
                     <div class="col-md-6">
                       <label>Customer Email</label>
                       <select class="form-control" name="role">
-                        <?php if($cust->role == 1){
+                        <?php if ($cust->role == 1) {
                           $data_role = 'Faculty';
-                        }else{
+                        } else {
                           $data_role = 'Student';
                         } ?>
                         <option value='<?php echo $cust->role; ?>'><?php echo $data_role; ?></option>
@@ -121,16 +125,61 @@ require_once('partials/_head.php');
           </div>
         </div>
         <!-- Footer -->
-      <?php
-      require_once('partials/_footer.php');
+        <?php
+        require_once('partials/_footer.php');
     }
-      ?>
-      </div>
+    ?>
+    </div>
   </div>
   <!-- Argon Scripts -->
   <?php
   require_once('partials/_scripts.php');
   ?>
+
+  <!-- SweetAlert2 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const form = document.getElementById('updateCustomerForm');
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault(); // Stop form submission
+
+        const name = form.customer_name.value.trim();
+        const phone = form.customer_phoneno.value.trim();
+        const email = form.customer_email.value.trim();
+        const password = form.customer_password.value.trim();
+
+        // Client-side validation for empty fields
+        if (!name || !phone || !email || !password) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Missing Fields',
+            text: 'Please fill in all required fields before submitting.'
+          });
+          return;
+        }
+
+        // Confirmation prompt
+        Swal.fire({
+          title: 'Are you sure?',
+          text: "Do you want to update this customer's information?",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#28a745',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, update it!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            form.submit(); // Submit if confirmed
+          }
+        });
+      });
+    });
+  </script>
+
+
 </body>
 
 </html>

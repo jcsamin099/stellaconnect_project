@@ -3,44 +3,49 @@ session_start();
 include('config/config.php');
 //login 
 if (isset($_POST['addCustomer'])) {
-    //Prevent Posting Blank Values
-    if (empty($_POST["customer_phoneno"]) || empty($_POST["customer_name"]) || empty($_POST['customer_email']) || empty($_POST['customer_password'])) {
-        $err = "Blank Values Not Accepted";
+    // Prevent SQL injection by escaping and preparing inputs
+    $customer_id = $_POST['customer_id'];
+    $customer_name = $_POST['customer_name'];
+    $customer_phoneno = $_POST['customer_phoneno'];
+    $customer_email = $_POST['customer_email'];
+    $customer_password = $_POST['customer_password'];
+
+    // Check if customer already exists in rpos_customers
+    $check_sql = "SELECT * FROM rpos_customers WHERE customer_email = ?";
+    $check_stmt = $mysqli->prepare($check_sql);
+    $check_stmt->bind_param('s', $customer_email);
+    $check_stmt->execute();
+    $check_stmt->store_result();
+
+    if ($check_stmt->num_rows > 0) {
+        $err = "An account with this email already exists.";
     } else {
+        // Check if the email is associated with a registered school
+        $sql = "SELECT * FROM school_details WHERE school_id = ?";
+        $stmt = $mysqli->prepare($sql);
+        $stmt->bind_param("s", $customer_email);
+        $stmt->execute();
+        $res = $stmt->get_result();
 
+        if ($res->num_rows >= 1) {
+            $row = $res->fetch_array();
+            $role = $row['role'];
 
+            // Proceed with inserting into rpos_customers
+            $postQuery = "INSERT INTO rpos_customers (customer_id, customer_name, customer_phoneno, customer_email, customer_password, role) VALUES (?, ?, ?, ?, ?, ?)";
+            $postStmt = $mysqli->prepare($postQuery);
+            $postStmt->bind_param('ssssss', $customer_id, $customer_name, $customer_phoneno, $customer_email, $customer_password, $role);
+            $postStmt->execute();
 
-        $customer_name = $_POST['customer_name'];
-        $customer_phoneno = $_POST['customer_phoneno'];
-        $customer_email = $_POST['customer_email'];
-        $customer_password = sha1(md5($_POST['customer_password'])); //Hash This 
-        $customer_id = $_POST['customer_id'];
-
-        $sql="select * from school_details where school_id='$customer_email'";
-        $query=$mysqli->query($sql);
-        $row=$query->fetch_array();
-        $row_cnt = $query->num_rows;
-       
-        if($row_cnt >= 1){
-        $role = $row['role'];
-        //Insert Captured information to a database table
-        $postQuery = "INSERT INTO rpos_customers (customer_id, customer_name, customer_phoneno, customer_email, customer_password, role) VALUES(?,?,?,?,?,?)";
-        $postStmt = $mysqli->prepare($postQuery);
-        //bind paramaters
-        $rc = $postStmt->bind_param('ssssss', $customer_id, $customer_name, $customer_phoneno, $customer_email, $customer_password, $role);
-        $postStmt->execute();
-        //declare a varible which will be passed to alert function
-        if ($postStmt) {
-            $success = "Customer Account Created" && header("refresh:1; url=index.php");
+            if ($postStmt) {
+                $success = "Customer Account Created";
+                header(" url=index.php");
+            } else {
+                $err = "Please Try Again Or Try Later";
+            }
         } else {
-            $err = "Please Try Again Or Try Later";
+            $err = "Email is not registered to school records! Try again.";
         }
-
-    }else{
-        $err = "Email does not registered to school records! try again";  
-    }
-
-
     }
 }
 require_once('partials/_head.php');
@@ -72,8 +77,10 @@ require_once('config/code-generator.php');
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fas fa-user"></i></span>
                                         </div>
-                                        <input class="form-control" required name="customer_name" placeholder="Full Name" type="text">
-                                        <input class="form-control" value="<?php echo $cus_id;?>" required name="customer_id"  type="hidden">
+                                        <input class="form-control" required name="customer_name"
+                                            placeholder="Full Name" type="text">
+                                        <input class="form-control" value="<?php echo $cus_id; ?>" required
+                                            name="customer_id" type="hidden">
                                     </div>
                                 </div>
                                 <div class="form-group mb-3">
@@ -81,7 +88,8 @@ require_once('config/code-generator.php');
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fas fa-phone"></i></span>
                                         </div>
-                                        <input class="form-control" required name="customer_phoneno" placeholder="Phone Number" type="text">
+                                        <input class="form-control" required name="customer_phoneno"
+                                            placeholder="Phone Number" type="text">
                                     </div>
                                 </div>
                                 <div class="form-group mb-3">
@@ -89,7 +97,8 @@ require_once('config/code-generator.php');
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="ni ni-email-83"></i></span>
                                         </div>
-                                        <input class="form-control" required name="customer_email" placeholder="Email" type="email">
+                                        <input class="form-control" required name="customer_email" placeholder="Email"
+                                            type="email">
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -97,7 +106,8 @@ require_once('config/code-generator.php');
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
                                         </div>
-                                        <input class="form-control" required name="customer_password" placeholder="Password" type="password">
+                                        <input class="form-control" required name="customer_password"
+                                            placeholder="Password" type="password">
                                     </div>
                                 </div>
 
@@ -105,7 +115,8 @@ require_once('config/code-generator.php');
                                 </div>
                                 <div class="form-group">
                                     <div class="text-left">
-                                        <button type="submit" name="addCustomer" class="btn btn-primary my-4">Create Account</button>
+                                        <button type="submit" name="addCustomer" class="btn btn-primary my-4">Create
+                                            Account</button>
                                         <a href="../index.php" class=" btn btn-success pull-right">Log In</a>
                                     </div>
                                 </div>
@@ -114,7 +125,8 @@ require_once('config/code-generator.php');
                     </div>
                     <div class="row mt-3">
                         <div class="col-6">
-                            <a href="../admin/forgot_pwd.php" target="_blank" class="text-light"><small>Forgot password?</small></a>
+                            <a href="../admin/forgot_pwd.php" target="_blank" class="text-light"><small>Forgot
+                                    password?</small></a>
                         </div>
                     </div>
                 </div>
